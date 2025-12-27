@@ -1,0 +1,174 @@
+name: Australian Government Budget 2007-08
+children:
+- name: General public services
+  children:
+  - name: Legislative and executive affairs
+    budget: 961000000.0
+  - name: Financial and fiscal affairs
+    budget: 6102000000.0
+  - name: Foreign affairs and economic aid
+    budget: 3881000000.0
+  - name: General research
+    budget: 2146000000.0
+  - name: General services
+    budget: 925000000.0
+  - name: Government superannuation benefits
+    budget: 2600000000.0
+- name: Defence
+  budget: 17670000000.0
+- name: Public order and safety
+  children:
+  - name: Courts and legal services
+    budget: 950000000.0
+  - name: Other public order and safety
+    budget: 2556000000.0
+- name: Education
+  children:
+  - name: Higher education
+    budget: 6850000000.0
+  - name: Vocational and other education
+    budget: 1554000000.0
+  - name: Schools
+    budget: 9163000000.0
+    children:
+    - name: Non-government schools
+      budget: 6085000000.0
+    - name: Government schools
+      budget: 3078000000.0
+  - name: School education - specific funding
+    budget: 389000000.0
+  - name: Student assistance
+    budget: 472000000.0
+  - name: General administration
+    budget: 5000000.0
+- name: Health
+  children:
+  - name: Medical services and benefits
+    budget: 19089000000.0
+  - name: Pharmaceutical benefits and services
+    budget: 8593000000.0
+  - name: National healthcare specific purpose payment
+    children:
+    - name: Hospital services
+      budget: 1791000000.0
+    - name: Health care agreements
+      budget: 9968000000.0
+  - name: Health services
+    budget: 2876000000.0
+  - name: General administration
+    budget: 764000000.0
+  - name: Health assistance to the aged
+    budget: 816000000.0
+  - name: Aboriginal and Torres Strait Islander health
+    budget: 500000000.0
+- name: Social security and welfare
+  children:
+  - name: Assistance to the aged
+    budget: 35454000000.0
+  - name: Assistance to veterans and dependants
+    budget: 6395000000.0
+  - name: Assistance to people with disabilities
+    budget: 14368000000.0
+  - name: Assistance to families with children
+    budget: 28528000000.0
+  - name: Assistance to the unemployed and the sick
+    budget: 4371000000.0
+  - name: Common youth allowance
+    budget: 2026000000.0
+  - name: Other welfare programmes
+    budget: 2464000000.0
+  - name: Assistance for Indigenous Australians nec
+    budget: 1418000000.0
+  - name: General administration
+    budget: 2818000000.0
+- name: Housing and community amenities
+  children:
+  - name: Housing
+    budget: 1646000000.0
+  - name: Urban and regional development
+    budget: 164000000.0
+  - name: Environment protection
+    budget: 1100000000.0
+- name: Recreation and culture
+  children:
+  - name: Broadcasting
+    budget: 1320000000.0
+  - name: Arts and cultural heritage
+    budget: 1267000000.0
+  - name: Sport and recreation
+    budget: 450000000.0
+  - name: National estate and parks
+    budget: 171000000.0
+- name: Fuel and energy
+  budget: 5361000000.0
+- name: Agriculture, forestry and fishing
+  children:
+  - name: Wool industry
+    budget: 57000000.0
+  - name: Grains industry
+    budget: 110000000.0
+  - name: Dairy industry
+    budget: 69000000.0
+  - name: Cattle, sheep and pig industry
+    budget: 165000000.0
+  - name: Fishing, horticulture and other agriculture
+    budget: 353000000.0
+  - name: General assistance not allocated to specific industries
+    budget: 456000000.0
+  - name: Rural assistance
+    budget: 1343000000.0
+  - name: Natural resources development
+    budget: 766000000.0
+  - name: General administration
+    budget: 516000000.0
+- name: Mining, manufacturing and construction
+  budget: 1410000000.0
+- name: Transport and communication
+  children:
+  - name: Communication
+    budget: 534000000.0
+  - name: Rail transport
+    budget: 186000000.0
+  - name: Air transport
+    budget: 141000000.0
+  - name: Road transport
+    budget: 2853000000.0
+  - name: Sea transport
+    budget: 239000000.0
+  - name: Other transport and communication
+    budget: 177000000.0
+- name: Other economic affairs
+  children:
+  - name: Tourism and area promotion
+    budget: 207000000.0
+    children:
+    - name: Vocational and industry training
+      budget: 999000000.0
+    - name: Labour market assistance to job seekers and industry
+      budget: 1896000000.0
+    - name: Industrial relations
+      budget: 508000000.0
+    - name: Immigration
+      budget: 1102000000.0
+  - name: Other economic affairs nec
+    budget: 1213000000.0
+- name: Other purposes
+  children:
+  - name: Public debt interest
+    budget: 3544000000.0
+    children:
+    - name: Interest on Commonwealth Government's behalf
+      budget: 3544000000.0
+  - name: Nominal superannuation interest
+    budget: 6011000000.0
+  - name: General purpose inter-government transactions
+    budget: 45277000000.0
+    children:
+    - name: General revenue assistance - States and Territories
+      budget: 43479000000.0
+    - name: Local government assistance
+      budget: 1798000000.0
+  - name: Natural disaster relief
+    budget: 28000000.0
+  - name: Contingency reserve
+    budget: 8000000.0

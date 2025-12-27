@@ -1,0 +1,19 @@
+timezone: Australia/Melbourne
+
+permalink: /:title
+
+plugins:
+  - jekyll-sitemap
+
+# SCSS
+sass:
+  style: compressed
+
+exclude:
+  - "*.py"
+  - pyproject.toml
+  - uv.lock
+  - Makefile
+  - README.md
+  - Gemfile
+  - Gemfile.lock

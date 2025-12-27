@@ -1,0 +1,122 @@
+---
+layout: default
+title: Government Expenditure Visualiser
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Gov Daisy</h1>
+            <p class="subtitle">Interactive visualisation of federal budget allocations and spending</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="controls">
+            <div class="control-group">
+                <label for="year-slider">Fiscal Year:</label>
+                <input type="range" id="year-slider" min="0" max="0" step="1">
+                <span id="year-slider-value"></span>
+            </div>
+
+            <!-- View mode selector removed: Only Budgeted Amount is shown -->
+        </div>
+
+        <div id="visualisation-container">
+            <svg id="sunburst"></svg>
+            <div id="tooltip" class="tooltip"></div>
+            <div id="centre-info">
+                <div id="centre-value">$0</div>
+                <div id="centre-subtitle"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Copyright &copy; 2025 <a href="https://gavindou.ch" target="_blank" rel="noopener">Gavin Douch</a></p>
+        </div>
+    </footer>
+
+    <script>
+    // DEBUG: site.data keys: {{ site.data | keys | join: ', ' }}
+    </script>
+        {% assign valid_years = '' | split: ',' %}
+        {% for pair in site.data %}
+            {% assign k = pair[0] %}
+            {% if k contains 'year_' %}
+                {% assign valid_years = valid_years | push: k %}
+            {% endif %}
+        {% endfor %}
+        <script>
+        // DEBUG: valid_years = [{{ valid_years | join: ', ' }}]
+        </script>
+        {% capture jsdata %}{% assign comma = '' %}{% for y in valid_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
+    <script>
+        // Embed Jekyll data as JavaScript objects (all per-year files in _data/)
+        // If Liquid is not processed, fallback to empty object to avoid JS errors
+        window.expenditureData = window.expenditureData || {};
+        {% if jsdata and jsdata != '' %}
+        window.expenditureData = { {{ jsdata }} };
+        {% else %}
+        window.expenditureData = {};
+        {% endif %}
+        // Populate year selector with all available years (format: 2024-25)
+        const yearSelect = document.getElementById('year-select');
+        const yearSlider = document.getElementById('year-slider');
+        const yearSliderValue = document.getElementById('year-slider-value');
+        if (yearSlider && yearSliderValue) {
+            const years = Object.keys(window.expenditureData).sort();
+            yearSlider.min = 0;
+            yearSlider.max = years.length - 1;
+            // Default to current financial year (latest)
+            let defaultIndex = years.length - 1;
+            // Try to find the year matching the current date
+            const now = new Date();
+            const thisYear = now.getFullYear();
+            const thisMonth = now.getMonth();
+            // Financial year starts July (month 6)
+            let fyString = '';
+            if (thisMonth >= 6) {
+                fyString = `${thisYear}-${(thisYear+1).toString().slice(-2)}`;
+            } else {
+                fyString = `${thisYear-1}-${thisYear.toString().slice(-2)}`;
+            }
+            const fyIndex = years.findIndex(y => y.replace('_','-') === fyString);
+            if (fyIndex !== -1) defaultIndex = fyIndex;
+            yearSlider.value = defaultIndex;
+            // Show (estimate) for future years
+            let displayYear = years[defaultIndex].replace('_','-');
+            const fyParts = displayYear.split('-');
+            let fyEnd = null;
+            if (fyParts.length === 2) {
+                // Use the start year to determine the century
+                let startYear = parseInt(fyParts[0], 10);
+                let endYearShort = parseInt(fyParts[1], 10);
+                if (!isNaN(startYear) && !isNaN(endYearShort)) {
+                    let century = Math.floor(startYear / 100) * 100;
+                    // If endYearShort < startYear % 100, it's next century
+                    let endYear = century + endYearShort;
+                    if (endYearShort < (startYear % 100)) endYear += 100;
+                    fyEnd = endYear;
+                }
+            }
+            if (fyEnd !== null && fyEnd > now.getFullYear()) {
+                displayYear += ' (estimate)';
+            }
+            yearSliderValue.textContent = displayYear;
+            // Store years array globally for JS
+            window.yearSliderYears = years;
+        }
+    </script>
+    <script src="{{ '/assets/js/visualisation.js' | relative_url }}"></script>
+</body>
+</html>
