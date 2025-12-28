@@ -1,39 +1,37 @@
-
+/* global d3 */
+const ARC_STROKE = "#fff";
+const ARC_STROKE_WIDTH = "2px";
+const ARC_PAD_ANGLE_MAX = 0.005;
+const ARC_PAD_RADIUS_RATIO = 0.5;
 if (!window.squishedDepths) window.squishedDepths = new Set();
 
 let currentData = null;
 let currentYear = null;
-let viewMode = 'budget';
+let viewMode = "budget";
 let svg, g, radius, arc, root;
-let searchResults = [];
 let currentFocus = null;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function() {
     if (window.expenditureData && window.yearSliderYears) {
-        const yearSlider = document.getElementById('year-slider');
+        const yearSlider = document.getElementById("year-slider");
         const years = window.yearSliderYears;
         // Set up slider min, max, and value
         if (yearSlider) {
             yearSlider.min = 0;
             yearSlider.max = years.length - 1;
             // Try to set default to current fiscal year if present
-            const now = new Date();
             let fyIdx = -1;
             for (let i = 0; i < years.length; i++) {
                 // Fiscal year string is like '2023-24', so parse the end year
-                const fy = years[i].replace('_', '-');
-                const parts = fy.split('-');
+                const fy = years[i].replace("_", "-");
+                const parts = fy.split("-");
                 if (parts.length === 2) {
                     let startYear = parseInt(parts[0], 10);
                     let endYearShort = parseInt(parts[1], 10);
                     if (!isNaN(startYear) && !isNaN(endYearShort)) {
-                        let century = Math.floor(startYear / 100) * 100;
-                        let endYear = century + endYearShort;
-                        if (endYearShort < (startYear % 100)) endYear += 100;
                         // Fiscal year ends in June, so if now is before July, use previous FY
-                        let fyEnd = endYear;
                         let fyStart = startYear;
-                        let fiscalYearForNow = now.getMonth() < 6 ? now.getFullYear() - 1 : now.getFullYear();
+                        let fiscalYearForNow = (new Date()).getMonth() < 6 ? (new Date()).getFullYear() - 1 : (new Date()).getFullYear();
                         if (fyStart === fiscalYearForNow) {
                             fyIdx = i;
                             break;
@@ -45,24 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
             yearSlider.value = idx;
             currentYear = years[idx] || years[years.length - 1];
             // Set the label
-            const yearSliderValue = document.getElementById('year-slider-value');
+            const yearSliderValue = document.getElementById("year-slider-value");
             if (yearSliderValue) {
-                let displayYear = currentYear.replace('_','-');
-                const fyParts = displayYear.split('-');
-                let fyEnd = null;
-                if (fyParts.length === 2) {
-                    let startYear = parseInt(fyParts[0], 10);
-                    let endYearShort = parseInt(fyParts[1], 10);
-                    if (!isNaN(startYear) && !isNaN(endYearShort)) {
-                        let century = Math.floor(startYear / 100) * 100;
-                        let endYear = century + endYearShort;
-                        if (endYearShort < (startYear % 100)) endYear += 100;
-                        fyEnd = endYear;
-                    }
-                }
-                if (fyEnd !== null && fyEnd > now.getFullYear()) {
-                    displayYear += ' (estimate)';
-                }
+                let displayYear = currentYear.replace("_","-");
                 yearSliderValue.textContent = displayYear;
             }
         }
@@ -72,18 +55,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setupDataTypeSwitch();
 });
 function setupDataTypeSwitch() {
-    const dataTypeSwitch = document.getElementById('data-type-switch');
+    const dataTypeSwitch = document.getElementById("data-type-switch");
     if (!dataTypeSwitch) return;
-    dataTypeSwitch.addEventListener('change', function(e) {
-        if (e.target.value === 'expenses') {
+    dataTypeSwitch.addEventListener("change", function(e) {
+        if (e.target.value === "expenses") {
             window.expenditureData = window.expensesData;
-        } else if (e.target.value === 'revenue') {
+        } else if (e.target.value === "revenue") {
             window.expenditureData = window.revenueData;
         }
         // Update year slider and reload data
         const years = Object.keys(window.expenditureData).sort();
         window.yearSliderYears = years;
-        const yearSlider = document.getElementById('year-slider');
+        const yearSlider = document.getElementById("year-slider");
         if (yearSlider) {
             yearSlider.min = 0;
             yearSlider.max = years.length - 1;
@@ -97,33 +80,17 @@ function setupDataTypeSwitch() {
 }
 
 function setupEventListeners() { 
-    const yearSlider = document.getElementById('year-slider');
-    const yearSliderValue = document.getElementById('year-slider-value');
+    const yearSlider = document.getElementById("year-slider");
+    const yearSliderValue = document.getElementById("year-slider-value");
     if (yearSlider && yearSliderValue && window.yearSliderYears) {
-        yearSlider.addEventListener('input', function(event) {
+        yearSlider.addEventListener("input", function(event) {
             const idx = parseInt(event.target.value, 10);
             const years = window.yearSliderYears;
             if (years && years[idx]) {
-                let displayYear = years[idx].replace('_','-');
-                const now = new Date();
-                const fyParts = displayYear.split('-');
-                let fyEnd = null;
-                if (fyParts.length === 2) {
-                    let startYear = parseInt(fyParts[0], 10);
-                    let endYearShort = parseInt(fyParts[1], 10);
-                    if (!isNaN(startYear) && !isNaN(endYearShort)) {
-                        let century = Math.floor(startYear / 100) * 100;
-                        let endYear = century + endYearShort;
-                        if (endYearShort < (startYear % 100)) endYear += 100;
-                        fyEnd = endYear;
-                    }
-                }
-                if (fyEnd !== null && fyEnd > now.getFullYear()) {
-                    displayYear += ' (estimate)';
-                }
+                let displayYear = years[idx].replace("_","-");
                 yearSliderValue.textContent = displayYear;
                 handleYearChange({ target: { value: years[idx] } });
-                if (typeof root !== 'undefined') {
+                if (typeof root !== "undefined") {
                     updateCentreInfo(root);
                 }
             }
@@ -150,32 +117,20 @@ async function loadData(year) {
 }
 
 function createSunburst() {
-    const container = document.getElementById('visualisation-container');
+    const container = document.getElementById("visualisation-container");
     const width = Math.max(container.clientWidth - 40, 600);
     const height = 800;
     radius = Math.min(width, height) / 2 - 20;
-    d3.select('#sunburst').selectAll('*').remove();
-    svg = d3.select('#sunburst')
-        .attr('width', width)
-        .attr('height', height);
-    g = svg.append('g')
-        .attr('transform', `translate(${width / 2},${height / 2})`);
+    d3.select("#sunburst").selectAll("*").remove();
+    svg = d3.select("#sunburst")
+        .attr("width", width)
+        .attr("height", height);
+    g = svg.append("g")
+        .attr("transform", `translate(${width / 2},${height / 2})`);
     const partition = d3.partition()
         .size([2 * Math.PI, radius]);
-    function filterDollarM(node) {
-        if (node.name === '$m' && (!node.children || node.children.length === 0)) {
-            return null;
-        }
-        if (node.children) {
-            node.children = node.children
-                .map(filterDollarM)
-                .filter(child => child !== null);
-        }
-        return node;
-    }
-    const filteredData = filterDollarM(JSON.parse(JSON.stringify(currentData)));
-    root = d3.hierarchy(filteredData)
-        .sum(d => getValueForMode(d))
+    root = d3.hierarchy(currentData)
+        .sum(d => d.budget || d.totalBudget || 0)
         .sort((a, b) => b.value - a.value);
     partition(root);
     root.each(d => {
@@ -184,21 +139,29 @@ function createSunburst() {
     arc = d3.arc()
         .startAngle(d => d.x0)
         .endAngle(d => d.x1)
-        .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
-        .padRadius(radius / 2)
+        .padAngle(d => Math.min((d.x1 - d.x0) / 2, ARC_PAD_ANGLE_MAX))
+        .padRadius(radius * ARC_PAD_RADIUS_RATIO)
         .innerRadius(d => d.y0)
         .outerRadius(d => d.y1 - 1);
+    g.selectAll(".centre-circle").remove();
+    g.append("circle")
+        .attr("class", "centre-circle")
+        .attr("r", radius * 0.35)
+        .style("fill", "transparent")
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .style("pointer-events", "all")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        });
     const colour = d3.scaleOrdinal()
         .domain(root.children.map(d => d.data.name))
         .range(d3.schemeSet3);
-    const path = g.selectAll('path')
+    g.selectAll("path")
         .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)))
-        .join('path')
-        .attr('fill', d => {
-            if (viewMode === 'comparison' && d.data.budget && d.data.actual) {
-                const variance = ((d.data.actual - d.data.budget) / d.data.budget) * 100;
-                return getVarianceColour(variance);
-            }
+        .join("path")
+        .attr("fill", d => {
             let topLevel = d;
             while (topLevel.depth > 1) topLevel = topLevel.parent;
             const parentColour = colour(topLevel.data.name);
@@ -223,25 +186,43 @@ function createSunburst() {
             const deeperLightness = Math.max(0, Math.min(1, baseHSL.l - 0.12 - (d.depth - 2) * 0.07));
             return d3.hsl(childHue, childSat, deeperLightness).toString();
         })
-        .attr('d', arc)
-        .style('cursor', 'pointer')
-        .style('stroke', '#fff')
-        .style('stroke-width', '2px')
-        .on('click', clicked)
-        .on('mouseover', handleMouseOver)
-        .on('mouseout', handleMouseOut);
-    g.selectAll('.centre-circle').remove();
-    g.append('circle')
-        .attr('class', 'centre-circle')
-        .attr('r', radius * 0.25)
-        .style('fill', 'transparent')
-        .style('cursor', currentFocus !== root ? 'pointer' : 'default')
-        .style('pointer-events', 'all')
-        .on('click', function() {
+        .attr("d", arc)
+        .style("cursor", "pointer")
+        .style("stroke", ARC_STROKE)
+        .style("stroke-width", ARC_STROKE_WIDTH)
+        .on("click", clicked)
+        .on("mouseover", handleMouseOver)
+        .on("mouseout", handleMouseOut);
+    g.selectAll(".centre-value-svg").remove();
+    g.selectAll(".centre-subtitle-svg").remove();
+    g.append("text")
+        .attr("class", "centre-value-svg")
+        .attr("text-anchor", "middle")
+        .attr("y", 0)
+        .attr("font-size", "2em")
+        .attr("font-weight", 700)
+        .attr("fill", "#2c3e50")
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
             if (currentFocus !== root) {
                 resetZoom();
             }
-        });
+        })
+        .text("");
+    g.append("text")
+        .attr("class", "centre-subtitle-svg")
+        .attr("text-anchor", "middle")
+        .attr("y", 32)
+        .attr("font-size", "0.9em")
+        .attr("fill", "#7f8c8d")
+        .attr("font-style", "italic")
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        })
+        .text("");
     if (!currentFocus) {
         currentFocus = root;
         updateCentreInfo(root);
@@ -250,23 +231,27 @@ function createSunburst() {
     }
 }
 
-function getValueForMode(d) {
-    // Handle both raw data objects and node data
-    const data = d.data || d;
-    
-    // Only count leaf nodes - if this has children, let D3 sum them instead
-    if (data.children && data.children.length > 0) {
-        return 0;
+
+function getAncestryPath(node) {
+    const path = [];
+    let n = node;
+    while (n) {
+        path.unshift(n.data && n.data.name);
+        n = n.parent;
     }
-    return data.budget || data.totalBudget || 0;
+    return path;
 }
 
-function getVarianceColour(variance) {
-    if (variance < -5) return '#27ae60'; // Dark green - significantly under budget
-    if (variance < 0) return '#2ecc71'; // Green - under budget
-    if (variance < 5) return '#f39c12'; // Orange - slightly over budget
-    if (variance < 10) return '#e67e22'; // Dark orange - over budget
-    return '#e74c3c'; // Red - significantly over budget
+function findNodeByPath(node, pathArr, depth = 0) {
+    if (!node || !pathArr || node.data.name !== pathArr[depth]) return null;
+    if (depth === pathArr.length - 1) return node;
+    if (node.children) {
+        for (const child of node.children) {
+            const found = findNodeByPath(child, pathArr, depth + 1);
+            if (found) return found;
+        }
+    }
+    return null;
 }
 
 function clicked(event, p) {
@@ -289,41 +274,21 @@ function clicked(event, p) {
         y0: Math.max(0, d.y0 - p.depth),
         y1: Math.max(0, d.y1 - p.depth)
     });
-    const arcs = g.selectAll('path')
-        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)), d => d.ancestors().map(n => n.data.name).join('/'));
+    const arcs = g.selectAll("path")
+        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)), d => d.ancestors().map(n => n.data.name).join("/"));
     arcs.transition()
         .duration(750)
-        .tween('data', d => {
+        .tween("data", d => {
             const i = d3.interpolate(d.current, d.target);
             return t => d.current = i(t);
         })
-        .attrTween('d', d => () => arc(d.current))
-        .on('end', function(_, d) {
+        .attrTween("d", d => () => arc(d.current))
+        .on("end", function() {
             window.squishedDepths.add(ringDepth);
             currentFocus = p;
             updateCentreInfo(currentFocus);
         });
     if (squishedRingCount === 0) {
-        function getAncestryPath(node) {
-            const path = [];
-            let n = node;
-            while (n) {
-                path.unshift(n.data && n.data.name);
-                n = n.parent;
-            }
-            return path;
-        }
-        function findNodeByPath(node, pathArr, depth = 0) {
-            if (!node || !pathArr || node.data.name !== pathArr[depth]) return null;
-            if (depth === pathArr.length - 1) return node;
-            if (node.children) {
-                for (const child of node.children) {
-                    const found = findNodeByPath(child, pathArr, depth + 1);
-                    if (found) return found;
-                }
-            }
-            return null;
-        }
         const ancestryPath = getAncestryPath(p);
         const newFocus = findNodeByPath(root, ancestryPath);
         currentFocus = newFocus || root;
@@ -333,102 +298,85 @@ function clicked(event, p) {
 }
 
 function handleMouseOver(event, d) {
-    const tooltip = document.getElementById('tooltip');
+    const tooltip = document.getElementById("tooltip");
     const value = d.value;
     const percentage = formatNumber((value / root.value) * 100, 2);
     
     // Show parent name if this node is $m
-    let label = d.data.name === '$m' && d.parent ? d.parent.data.name : d.data.name;
+    let label = d.data.name === "$m" && d.parent ? d.parent.data.name : d.data.name;
     let tooltipHTML = `
         <strong>${label}</strong><br>
         ${formatCurrency(value)}<br>
         <span class="percentage">${percentage}% of total</span>
     `;
     
-    if (viewMode === 'comparison' && d.data.budget && d.data.actual) {
+    if (viewMode === "comparison" && d.data.budget && d.data.actual) {
         const variance = d.data.actual - d.data.budget;
         const variancePercent = formatNumber((variance / d.data.budget) * 100, 2);
         tooltipHTML += `<br><br>
             <strong>Budget:</strong> ${formatCurrency(d.data.budget)}<br>
             <strong>Actual:</strong> ${formatCurrency(d.data.actual)}<br>
-            <strong>Variance:</strong> <span class="${variance > 0 ? 'over-budget' : 'under-budget'}">
-                ${variance > 0 ? '+' : ''}${formatCurrency(variance)} (${variancePercent}%)
+            <strong>Variance:</strong> <span class="${variance > 0 ? "over-budget" : "under-budget"}">
+                ${variance > 0 ? "+" : ""}${formatCurrency(variance)} (${variancePercent}%)
             </span>
         `;
     }
     
     tooltip.innerHTML = tooltipHTML;
-    tooltip.style.display = 'block';
-    tooltip.style.left = (event.clientX + 15) + 'px';
-    tooltip.style.top = (event.clientY + 15) + 'px';
+    tooltip.style.display = "block";
+    tooltip.style.left = (event.clientX + 15) + "px";
+    tooltip.style.top = (event.clientY + 15) + "px";
     
     // Highlight the segment
     d3.select(event.currentTarget)
-        .style('opacity', 0.8)
-        .style('stroke-width', '3px');
+        .style("opacity", 0.8)
+        .style("stroke-width", "3px");
 }
 
 function handleMouseOut(event) {
-    document.getElementById('tooltip').style.display = 'none';
+    document.getElementById("tooltip").style.display = "none";
     d3.select(event.currentTarget)
-        .style('opacity', 1)
-        .style('stroke-width', '2px');
+        .style("opacity", 1)
+        .style("stroke-width", "2px");
 }
 
 function updateCentreInfo(node) {
     let value;
+    let subtitle = "";
     if (node.depth === 0) {
-        // At root, use root.value (D3 sum of all descendants)
         value = root.value;
-        document.getElementById('centre-subtitle').textContent = '';
-        document.getElementById('centre-info').style.cursor = 'default';
+        subtitle = "";
     } else {
         value = node.value;
         const percentage = formatNumber((value / root.value) * 100, 2);
-        document.getElementById('centre-subtitle').textContent = `${percentage}% of budget`;
-        document.getElementById('centre-info').style.cursor = 'pointer';
+        subtitle = `${percentage}% of budget`;
     }
-    document.getElementById('centre-value').textContent = formatCurrency(value);
-}
-
-
-function zoomOut() {
-    if (currentFocus && currentFocus.parent) {
-        // Remove squished state for the new focus ring (parent's depth)
-        const newDepth = currentFocus.parent.depth + 1;
-        window.squishedDepths.delete(newDepth);
-        clicked({ stopPropagation: () => {} }, currentFocus.parent);
-    } else {
-    }
+    // Update SVG text elements
+    g.select(".centre-value-svg").text(formatCurrency(value));
+    g.select(".centre-subtitle-svg").text(subtitle);
 }
 
 function resetZoom() {
     if (window.squishedDepths) window.squishedDepths.clear();
     clicked({ stopPropagation: () => {} }, root);
-    document.getElementById('breadcrumb').innerHTML = '';
-}
-
-function updateStats() {
-    // Stats display removed as per user request
-    return;
 }
 
 function createLegend() {
     if (!root || !root.children) return;
-    const legendItems = document.getElementById('legend-items');
+    const legendItems = document.getElementById("legend-items");
     if (!legendItems) return;
-    legendItems.innerHTML = '';
+    legendItems.innerHTML = "";
     const colour = d3.scaleOrdinal()
         .domain(root.children.map(d => d.data.name))
         .range(d3.schemeSet3);
     root.children.forEach(child => {
-        const item = document.createElement('div');
-        item.className = 'legend-item';
-        const colourBox = document.createElement('span');
-        colourBox.className = 'legend-colour';
+        const item = document.createElement("div");
+        item.className = "legend-item";
+        const colourBox = document.createElement("span");
+        colourBox.className = "legend-colour";
         colourBox.style.backgroundColor = colour(child.data.name);
-        const label = document.createElement('span');
-        label.className = 'legend-label';
+        const label = document.createElement("span");
+        label.className = "legend-label";
         label.textContent = child.data.name;
         item.appendChild(colourBox);
         item.appendChild(label);
@@ -444,16 +392,16 @@ async function handleYearChange(event) {
     currentFocus = null;
     createSunburst();
     // Update slider position if changed programmatically
-    const yearSlider = document.getElementById('year-slider');
+    const yearSlider = document.getElementById("year-slider");
     const years = window.yearSliderYears;
     if (yearSlider && years) {
         const idx = years.indexOf(currentYear);
         if (idx !== -1) yearSlider.value = idx;
-        const yearSliderValue = document.getElementById('year-slider-value');
+        const yearSliderValue = document.getElementById("year-slider-value");
         if (yearSliderValue) {
-            let displayYear = currentYear.replace('_','-');
+            let displayYear = currentYear.replace("_","-");
             const now = new Date();
-            const fyParts = displayYear.split('-');
+            const fyParts = displayYear.split("-");
             let fyEnd = null;
             if (fyParts.length === 2) {
                 let startYear = parseInt(fyParts[0], 10);
@@ -466,56 +414,41 @@ async function handleYearChange(event) {
                 }
             }
             if (fyEnd !== null && fyEnd > now.getFullYear()) {
-                displayYear += ' (estimate)';
+                displayYear += " (estimate)";
             }
             yearSliderValue.textContent = displayYear;
         }
     }
     // Ensure centre-value updates to the new root for the selected year
-    if (typeof root !== 'undefined') {
+    if (typeof root !== "undefined") {
         currentFocus = root;
         updateCentreInfo(root);
     }
 }
 
-// handleViewModeChange removed (no longer needed)
-function exportData() {
-    const dataStr = JSON.stringify(currentData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `government-expenditure-${currentYear}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
-
 function formatNumber(num, maxDecimals = 2) {
     const s = Number(num).toFixed(maxDecimals);
-    return s.replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
+    return s.replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
 }
 
 function formatCurrency(value) {
-    const sign = value < 0 ? '-' : '';
+    const sign = value < 0 ? "-" : "";
     const abs = Math.abs(value);
     if (abs >= 1e12) {
-        return sign + '$' + formatNumber(abs / 1e12, 2) + 'T';
+        return sign + "$" + formatNumber(abs / 1e12, 2) + "T";
     } else if (abs >= 1e9) {
-        return sign + '$' + formatNumber(abs / 1e9, 2) + 'B';
+        return sign + "$" + formatNumber(abs / 1e9, 2) + "B";
     } else if (abs >= 1e6) {
-        return sign + '$' + formatNumber(abs / 1e6, 2) + 'M';
+        return sign + "$" + formatNumber(abs / 1e6, 2) + "M";
     } else if (abs >= 1e3) {
-        return sign + '$' + formatNumber(abs / 1e3, 2) + 'K';
+        return sign + "$" + formatNumber(abs / 1e3, 2) + "K";
     }
-    return sign + '$' + formatNumber(abs, 2);
+    return sign + "$" + formatNumber(abs, 2);
 }
 
 // Handle window resize
 let resizeTimer;
-window.addEventListener('resize', function() {
+window.addEventListener("resize", function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
         if (currentData) {

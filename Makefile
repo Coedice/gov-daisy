@@ -14,6 +14,7 @@ build:
 format:
 	uv run isort .
 	uv run ruff format
+	npm run lint
 
 .PHONY: clean
 clean:

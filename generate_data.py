@@ -12,29 +12,22 @@ EXPENSES_SHEET_NAME = "Table 7"
 REVENUE_SHEET_NAME = "Table 6"
 START_DATA_ROW = 4  # 0-based index, row 5 in Excel
 
-# Names to exclude from all budget processing
-EXCLUDE_NAMES = {
-    "Military and reserves",
-}
 
+def should_exclude(name: str, unit: str = None) -> bool:
+    for excluded_phrases in [
+        "Total",
+        "total",
+        "(underlying basis)",
+    ]:
+        if excluded_phrases in name:
+            return True
 
-def excluded_name(name) -> bool:
-    """
-    Return True if the given name is in the list of excluded names.
-    """
-    if name in EXCLUDE_NAMES:
+    if unit is not None and unit.strip().upper() == "ASL":
         return True
-
-    if "Total" in name or "total" in name:
-        return True
-
-    if "(underlying basis)" in name:
-        return True
-    
     return False
 
 
-def fetch_excel_bytes(url):
+def fetch_excel_bytes(url: str) -> io.BytesIO:
     """
     Download the Excel file from the given URL and return its bytes as a BytesIO object.
     """
@@ -43,20 +36,14 @@ def fetch_excel_bytes(url):
     return io.BytesIO(response.content)
 
 
-def build_budget_tree_from_excel(excel_bytes, years, sheet_name):
+def build_budget_tree_from_excel(
+    excel_bytes: io.BytesIO, years: list[str], sheet_name: str
+) -> tuple[dict, list[str]]:
     """
     Parse the Excel sheet and build a hierarchical tree using indent levels.
     Loads the Excel workbook, finds the header row, identifies year columns, and
     builds a nested dictionary structure representing the budget hierarchy.
     """
-
-    # Helper to determine if a node should be excluded
-    def should_exclude(name, unit=None):
-        if excluded_name(name):
-            return True
-        if unit is not None and unit.strip().upper() == "ASL":
-            return True
-        return False
 
     # Load Excel workbook and worksheet
     wb = openpyxl.load_workbook(excel_bytes, data_only=True)
@@ -81,7 +68,6 @@ def build_budget_tree_from_excel(excel_bytes, years, sheet_name):
         sval = str(val).strip() if val else ""
         if sval in years:
             year_col_indices.append(idx)
-
     # Build the hierarchical tree from the Excel rows
     data_start = header_row_idx + 1
     root = {"name": "Australian Government Budget", "children": []}
@@ -127,25 +113,16 @@ def build_budget_tree_from_excel(excel_bytes, years, sheet_name):
     return root, years
 
 
-def export_yearly_yaml(tree, years, output_dir, prefix="year_"):
+def export_yearly_yaml(
+    tree: dict, years: list[str], output_dir: str, prefix="year_"
+) -> None:
     """
     Export each year's budget data to a separate YAML file, filtering out unwanted nodes.
     Recursively filters the tree for each year and writes the result to a YAML file in the output directory.
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    # Helper to determine if a node should be excluded
-    def should_exclude(name, unit=None):
-        """
-        Return True if the node should be excluded from the output, based on name or unit.
-        """
-        if excluded_name(name):
-            return True
-        if unit is not None and unit.strip().upper() == "ASL":
-            return True
-        return False
-
-    def filter_for_year(node, year, unit=None):
+    def filter_for_year(node: dict, year: str, unit: str = None) -> dict | None:
         """
         Recursively filter the tree for a specific year, removing excluded nodes and keeping only relevant budget data.
         """
@@ -166,7 +143,7 @@ def export_yearly_yaml(tree, years, output_dir, prefix="year_"):
                 new_node["children"] = children
         return new_node
 
-    def add_siblings(node):
+    def add_siblings(node: dict) -> None:
         """
         Add a _siblings key to each child node containing a list of its siblings.
         This is used for possible future processing or filtering that may require sibling context.
@@ -240,48 +217,53 @@ if __name__ == "__main__":
             years_rev.append(sval)
     years_rev = sorted(set(years_rev))
 
-
     # Build the budget tree for revenue
     tree_rev, years_rev = build_budget_tree_from_excel(
         excel_bytes, years_rev, REVENUE_SHEET_NAME
     )
 
     # --- Special case: Net income tax (Gross income tax withholding - Individuals refunds) ---
-    def combine_net_income_tax(node):
-        if not node or not node.get('children'):
+    def combine_net_income_tax(node: dict) -> None:
+        if not node or not node.get("children"):
             return
-        for child in node['children']:
+        for child in node["children"]:
             combine_net_income_tax(child)
         # Look for the 'Individuals and other withholding taxes' node
-        for child in node['children']:
-            if child['name'] == 'Individuals and other withholding taxes' and child.get('children'):
+        for child in node["children"]:
+            if child["name"] == "Individuals and other withholding taxes" and child.get(
+                "children"
+            ):
                 gross = None
                 refunds = None
                 gross_idx = refunds_idx = None
-                for idx, sub in enumerate(child['children']):
-                    if sub['name'] == 'Gross income tax withholding':
+                for idx, sub in enumerate(child["children"]):
+                    if sub["name"] == "Gross income tax withholding":
                         gross = sub
                         gross_idx = idx
-                    elif sub['name'] == 'Individuals refunds':
+                    elif sub["name"] == "Individuals refunds":
                         refunds = sub
                         refunds_idx = idx
                 if gross and refunds:
                     # For each year, subtract refunds from gross
                     net_budgets = {}
                     for y in years_rev:
-                        gval = gross.get('budget', {}).get(y, 0)
-                        rval = refunds.get('budget', {}).get(y, 0)
+                        gval = gross.get("budget", {}).get(y, 0)
+                        rval = refunds.get("budget", {}).get(y, 0)
                         net_budgets[y] = gval + rval  # refunds is negative
-                    net_node = {'name': 'Net income tax', 'budget': net_budgets}
+                    net_node = {"name": "Net income tax", "budget": net_budgets}
                     # Remove both and insert net
-                    new_children = [sub for i, sub in enumerate(child['children']) if i not in (gross_idx, refunds_idx)]
+                    new_children = [
+                        sub
+                        for i, sub in enumerate(child["children"])
+                        if i not in (gross_idx, refunds_idx)
+                    ]
                     new_children.append(net_node)
-                    child['children'] = new_children
+                    child["children"] = new_children
 
     combine_net_income_tax(tree_rev)
 
     # Set output directory for revenue
-    output_dir_rev = os.path.abspath(
+    output_dir_rev: str = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "_data", "revenue")
     )
 
