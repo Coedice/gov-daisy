@@ -30,7 +30,7 @@ title: Gov Daisy
             <div class="control-group">
                 <label for="data-type-switch">Show:</label>
                 <select id="data-type-switch">
-                    <option value="expenses">Expenses</option>
+                    <option value="budget">Budget</option>
                     <option value="revenue">Revenue</option>
                 </select>
             </div>
@@ -52,12 +52,12 @@ title: Gov Daisy
     <script>
     // DEBUG: site.data keys: {{ site.data | keys | join: ', ' }}
     </script>
-        {% assign expenses_years = '' | split: ',' %}
+        {% assign budget_years = '' | split: ',' %}
         {% assign revenue_years = '' | split: ',' %}
-        {% for pair in site.data.expenses %}
+        {% for pair in site.data.budget %}
             {% assign k = pair[0] %}
             {% if k contains 'year_' %}
-                {% assign expenses_years = expenses_years | push: k %}
+                {% assign budget_years = budget_years | push: k %}
             {% endif %}
         {% endfor %}
         {% for pair in site.data.revenue %}
@@ -67,17 +67,17 @@ title: Gov Daisy
             {% endif %}
         {% endfor %}
         <script>
-        // DEBUG: expenses_years = [{{ expenses_years | join: ', ' }}]
+        // DEBUG: budget_years = [{{ budget_years | join: ', ' }}]
         // DEBUG: revenue_years = [{{ revenue_years | join: ', ' }}]
         </script>
-        {% capture jsdata_expenses %}{% assign comma = '' %}{% for y in expenses_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.expenses[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
+        {% capture jsdata_budget %}{% assign comma = '' %}{% for y in budget_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.budget[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
         {% capture jsdata_revenue %}{% assign comma = '' %}{% for y in revenue_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.revenue[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
     <script>
-        // Embed Jekyll data as JavaScript objects (all per-year files in _data/expenses/ and _data/revenue/)
-        window.expensesData = { {{ jsdata_expenses }} };
+        // Embed Jekyll data as JavaScript objects (all per-year files in _data/budget/ and _data/revenue/)
+        window.budgetData = { {{ jsdata_budget }} };
         window.revenueData = { {{ jsdata_revenue }} };
-        // Default to expenses
-        window.expenditureData = window.expensesData;
+        // Default to budget
+        window.expenditureData = window.budgetData;
         window.yearSliderYears = Object.keys(window.expenditureData).sort();
     </script>
     <script src="{{ '/assets/js/visualisation.js' | relative_url }}"></script>

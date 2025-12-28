@@ -58,10 +58,12 @@ function setupDataTypeSwitch() {
     const dataTypeSwitch = document.getElementById("data-type-switch");
     if (!dataTypeSwitch) return;
     dataTypeSwitch.addEventListener("change", function(e) {
-        if (e.target.value === "expenses") {
-            window.expenditureData = window.expensesData;
+        if (e.target.value === "budget") {
+            window.expenditureData = window.budgetData;
+            viewMode = "budget";
         } else if (e.target.value === "revenue") {
             window.expenditureData = window.revenueData;
+            viewMode = "revenue";
         }
         // Update year slider and reload data
         const years = Object.keys(window.expenditureData).sort();
@@ -75,6 +77,7 @@ function setupDataTypeSwitch() {
             yearSlider.value = idx;
             currentYear = years[idx];
         }
+        currentFocus = null;
         initialiseVisualisation();
     });
 }
@@ -101,7 +104,6 @@ function setupEventListeners() {
 async function initialiseVisualisation() {
     await loadData(currentYear);
     createSunburst();
-    createLegend();
 }
 
 async function loadData(year) {
@@ -341,16 +343,9 @@ function handleMouseOut(event) {
 }
 
 function updateCentreInfo(node) {
-    let value;
-    let subtitle = "";
-    if (node.depth === 0) {
-        value = root.value;
-        subtitle = "";
-    } else {
-        value = node.value;
-        const percentage = formatNumber((value / root.value) * 100, 2);
-        subtitle = `${percentage}% of budget`;
-    }
+    const value = node.value;
+    const percentage = formatNumber((value / root.value) * 100, 2);
+    const subtitle = node.depth === 0 ? `100% of ${viewMode === "revenue" ? "revenue" : "budget"}` : `${percentage}% of ${viewMode === "revenue" ? "revenue" : "budget"}`;
     // Update SVG text elements
     g.select(".centre-value-svg").text(formatCurrency(value));
     g.select(".centre-subtitle-svg").text(subtitle);
@@ -359,29 +354,6 @@ function updateCentreInfo(node) {
 function resetZoom() {
     if (window.squishedDepths) window.squishedDepths.clear();
     clicked({ stopPropagation: () => {} }, root);
-}
-
-function createLegend() {
-    if (!root || !root.children) return;
-    const legendItems = document.getElementById("legend-items");
-    if (!legendItems) return;
-    legendItems.innerHTML = "";
-    const colour = d3.scaleOrdinal()
-        .domain(root.children.map(d => d.data.name))
-        .range(d3.schemeSet3);
-    root.children.forEach(child => {
-        const item = document.createElement("div");
-        item.className = "legend-item";
-        const colourBox = document.createElement("span");
-        colourBox.className = "legend-colour";
-        colourBox.style.backgroundColor = colour(child.data.name);
-        const label = document.createElement("span");
-        label.className = "legend-label";
-        label.textContent = child.data.name;
-        item.appendChild(colourBox);
-        item.appendChild(label);
-        legendItems.appendChild(item);
-    });
 }
 
 async function handleYearChange(event) {
@@ -433,17 +405,14 @@ function formatNumber(num, maxDecimals = 2) {
 
 function formatCurrency(value) {
     const sign = value < 0 ? "-" : "";
-    const abs = Math.abs(value);
-    if (abs >= 1e12) {
-        return sign + "$" + formatNumber(abs / 1e12, 2) + "T";
-    } else if (abs >= 1e9) {
-        return sign + "$" + formatNumber(abs / 1e9, 2) + "B";
-    } else if (abs >= 1e6) {
-        return sign + "$" + formatNumber(abs / 1e6, 2) + "M";
-    } else if (abs >= 1e3) {
-        return sign + "$" + formatNumber(abs / 1e3, 2) + "K";
+    const suffixes = ["", "K", "M", "B", "T"];
+    let abs = Math.abs(value);
+    let i = 0;
+    while (abs >= 1e3 && i < suffixes.length - 1) {
+        abs /= 1e3;
+        i++;
     }
-    return sign + "$" + formatNumber(abs, 2);
+    return sign + "$" + formatNumber(abs, 2) + suffixes[i];
 }
 
 // Handle window resize

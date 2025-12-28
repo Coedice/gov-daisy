@@ -8,7 +8,7 @@ import requests
 import yaml
 
 EXCEL_URL = "https://www.pbo.gov.au/sites/default/files/2025-04/PBO%20Historical%20fiscal%20data%20-%202025-26%20Budget%20update.xlsx"
-EXPENSES_SHEET_NAME = "Table 7"
+BUDGET_SHEET_NAME = "Table 7"
 REVENUE_SHEET_NAME = "Table 6"
 START_DATA_ROW = 4  # 0-based index, row 5 in Excel
 
@@ -174,34 +174,34 @@ if __name__ == "__main__":
     # Download Excel file
     excel_bytes = fetch_excel_bytes(EXCEL_URL)
 
-    # --- Expenses ---
-    # Read the Excel file with pandas to extract year labels for expenses
-    raw_exp = pd.read_excel(excel_bytes, sheet_name=EXPENSES_SHEET_NAME, header=None)
-    year_label_row_exp = list(raw_exp.iloc[2])
-    years_exp = []
-    for val in year_label_row_exp:
+    # --- Budget ---
+    # Read the Excel file with pandas to extract year labels for budget
+    raw_budget = pd.read_excel(excel_bytes, sheet_name=BUDGET_SHEET_NAME, header=None)
+    year_label_row_budget = list(raw_budget.iloc[2])
+    years_budget = []
+    for val in year_label_row_budget:
         sval = str(val).strip()
         if len(sval) == 7 and sval[:4].isdigit() and sval[4] == "-":
-            years_exp.append(sval)
+            years_budget.append(sval)
         elif len(sval) == 4 and sval.isdigit():
-            years_exp.append(sval)
-    years_exp = sorted(set(years_exp))
+            years_budget.append(sval)
+    years_budget = sorted(set(years_budget))
 
-    # Build the budget tree for expenses
-    tree_exp, years_exp = build_budget_tree_from_excel(
-        excel_bytes, years_exp, EXPENSES_SHEET_NAME
+    # Build the budget tree for budget
+    tree_budget, years_budget = build_budget_tree_from_excel(
+        excel_bytes, years_budget, BUDGET_SHEET_NAME
     )
 
-    # Set output directory for expenses
-    output_dir_exp = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "_data", "expenses")
+    # Set output directory for budget
+    output_dir_budget = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "_data", "budget")
     )
 
-    # Export YAML files for each year (expenses)
-    export_yearly_yaml(tree_exp, years_exp, output_dir_exp)
+    # Export YAML files for each year (budget)
+    export_yearly_yaml(tree_budget, years_budget, output_dir_budget)
 
     print(
-        f"[INFO] Expenses data generation complete. YAML files written to {output_dir_exp}"
+        f"[INFO] Budget data generation complete. YAML files written to {output_dir_budget}"
     )
 
     # --- Revenue ---
