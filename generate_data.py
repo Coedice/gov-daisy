@@ -8,18 +8,30 @@ import requests
 import yaml
 
 EXCEL_URL = "https://www.pbo.gov.au/sites/default/files/2025-04/PBO%20Historical%20fiscal%20data%20-%202025-26%20Budget%20update.xlsx"
-SHEET_NAME = "Table 7"
+EXPENSES_SHEET_NAME = "Table 7"
+REVENUE_SHEET_NAME = "Table 6"
 START_DATA_ROW = 4  # 0-based index, row 5 in Excel
 
 # Names to exclude from all budget processing
 EXCLUDE_NAMES = {
-    "Total expenses (including GST revenue provision)",
-    "Total expenses (latest series)",
-    "Total expenses",
-    "ASL excluding military and reserves",
     "Military and reserves",
-    "Total ASL",
 }
+
+
+def excluded_name(name) -> bool:
+    """
+    Return True if the given name is in the list of excluded names.
+    """
+    if name in EXCLUDE_NAMES:
+        return True
+
+    if "Total" in name or "total" in name:
+        return True
+
+    if "(underlying basis)" in name:
+        return True
+    
+    return False
 
 
 def fetch_excel_bytes(url):
@@ -31,7 +43,7 @@ def fetch_excel_bytes(url):
     return io.BytesIO(response.content)
 
 
-def build_budget_tree_from_excel(excel_bytes, years):
+def build_budget_tree_from_excel(excel_bytes, years, sheet_name):
     """
     Parse the Excel sheet and build a hierarchical tree using indent levels.
     Loads the Excel workbook, finds the header row, identifies year columns, and
@@ -40,11 +52,7 @@ def build_budget_tree_from_excel(excel_bytes, years):
 
     # Helper to determine if a node should be excluded
     def should_exclude(name, unit=None):
-        if (
-            name in EXCLUDE_NAMES
-            or name.startswith("Total")
-            or "(underlying basis)" in name
-        ):
+        if excluded_name(name):
             return True
         if unit is not None and unit.strip().upper() == "ASL":
             return True
@@ -52,7 +60,7 @@ def build_budget_tree_from_excel(excel_bytes, years):
 
     # Load Excel workbook and worksheet
     wb = openpyxl.load_workbook(excel_bytes, data_only=True)
-    ws = wb[SHEET_NAME]
+    ws = wb[sheet_name]
 
     # Find the header row containing year labels
     year_pattern = re.compile(r"^\d{4}-\d{2,4}$")
@@ -119,7 +127,7 @@ def build_budget_tree_from_excel(excel_bytes, years):
     return root, years
 
 
-def export_yearly_yaml(tree, years, output_dir):
+def export_yearly_yaml(tree, years, output_dir, prefix="year_"):
     """
     Export each year's budget data to a separate YAML file, filtering out unwanted nodes.
     Recursively filters the tree for each year and writes the result to a YAML file in the output directory.
@@ -131,11 +139,7 @@ def export_yearly_yaml(tree, years, output_dir):
         """
         Return True if the node should be excluded from the output, based on name or unit.
         """
-        if (
-            name in EXCLUDE_NAMES
-            or name.startswith("Total")
-            or "(underlying basis)" in name
-        ):
+        if excluded_name(name):
             return True
         if unit is not None and unit.strip().upper() == "ASL":
             return True
@@ -178,7 +182,7 @@ def export_yearly_yaml(tree, years, output_dir):
     for year in years:
         out = filter_for_year(tree, year)
         out["name"] = f"Australian Government Budget {year}"
-        yml_path = os.path.join(output_dir, f"year_{year}.yml")
+        yml_path = os.path.join(output_dir, f"{prefix}{year}.yml")
         with open(yml_path, "w") as f:
             yaml.dump(out, f, sort_keys=False, allow_unicode=True)
 
@@ -193,25 +197,97 @@ if __name__ == "__main__":
     # Download Excel file
     excel_bytes = fetch_excel_bytes(EXCEL_URL)
 
-    # Read the Excel file with pandas to extract year labels
-    raw = pd.read_excel(excel_bytes, sheet_name=SHEET_NAME, header=None)
-    year_label_row = list(raw.iloc[2])
-    years = []
-    for val in year_label_row:
+    # --- Expenses ---
+    # Read the Excel file with pandas to extract year labels for expenses
+    raw_exp = pd.read_excel(excel_bytes, sheet_name=EXPENSES_SHEET_NAME, header=None)
+    year_label_row_exp = list(raw_exp.iloc[2])
+    years_exp = []
+    for val in year_label_row_exp:
         sval = str(val).strip()
         if len(sval) == 7 and sval[:4].isdigit() and sval[4] == "-":
-            years.append(sval)
+            years_exp.append(sval)
         elif len(sval) == 4 and sval.isdigit():
-            years.append(sval)
-    years = sorted(set(years))
+            years_exp.append(sval)
+    years_exp = sorted(set(years_exp))
 
-    # Build the budget tree from Excel
-    tree, years = build_budget_tree_from_excel(excel_bytes, years)
+    # Build the budget tree for expenses
+    tree_exp, years_exp = build_budget_tree_from_excel(
+        excel_bytes, years_exp, EXPENSES_SHEET_NAME
+    )
 
-    # Set output directory
-    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "_data"))
+    # Set output directory for expenses
+    output_dir_exp = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "_data", "expenses")
+    )
 
-    # Export YAML files for each year
-    export_yearly_yaml(tree, years, output_dir)
+    # Export YAML files for each year (expenses)
+    export_yearly_yaml(tree_exp, years_exp, output_dir_exp)
 
-    print(f"[INFO] Data generation complete. YAML files written to {output_dir}")
+    print(
+        f"[INFO] Expenses data generation complete. YAML files written to {output_dir_exp}"
+    )
+
+    # --- Revenue ---
+    # Read the Excel file with pandas to extract year labels for revenue
+    raw_rev = pd.read_excel(excel_bytes, sheet_name=REVENUE_SHEET_NAME, header=None)
+    year_label_row_rev = list(raw_rev.iloc[2])
+    years_rev = []
+    for val in year_label_row_rev:
+        sval = str(val).strip()
+        if len(sval) == 7 and sval[:4].isdigit() and sval[4] == "-":
+            years_rev.append(sval)
+        elif len(sval) == 4 and sval.isdigit():
+            years_rev.append(sval)
+    years_rev = sorted(set(years_rev))
+
+
+    # Build the budget tree for revenue
+    tree_rev, years_rev = build_budget_tree_from_excel(
+        excel_bytes, years_rev, REVENUE_SHEET_NAME
+    )
+
+    # --- Special case: Net income tax (Gross income tax withholding - Individuals refunds) ---
+    def combine_net_income_tax(node):
+        if not node or not node.get('children'):
+            return
+        for child in node['children']:
+            combine_net_income_tax(child)
+        # Look for the 'Individuals and other withholding taxes' node
+        for child in node['children']:
+            if child['name'] == 'Individuals and other withholding taxes' and child.get('children'):
+                gross = None
+                refunds = None
+                gross_idx = refunds_idx = None
+                for idx, sub in enumerate(child['children']):
+                    if sub['name'] == 'Gross income tax withholding':
+                        gross = sub
+                        gross_idx = idx
+                    elif sub['name'] == 'Individuals refunds':
+                        refunds = sub
+                        refunds_idx = idx
+                if gross and refunds:
+                    # For each year, subtract refunds from gross
+                    net_budgets = {}
+                    for y in years_rev:
+                        gval = gross.get('budget', {}).get(y, 0)
+                        rval = refunds.get('budget', {}).get(y, 0)
+                        net_budgets[y] = gval + rval  # refunds is negative
+                    net_node = {'name': 'Net income tax', 'budget': net_budgets}
+                    # Remove both and insert net
+                    new_children = [sub for i, sub in enumerate(child['children']) if i not in (gross_idx, refunds_idx)]
+                    new_children.append(net_node)
+                    child['children'] = new_children
+
+    combine_net_income_tax(tree_rev)
+
+    # Set output directory for revenue
+    output_dir_rev = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "_data", "revenue")
+    )
+
+    # Export YAML files for each year (revenue)
+    export_yearly_yaml(tree_rev, years_rev, output_dir_rev)
+
+    print(
+        f"[INFO] Revenue data generation complete. YAML files written to {output_dir_rev}"
+    )

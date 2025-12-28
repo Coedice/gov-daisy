@@ -12,13 +12,89 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.expenditureData && window.yearSliderYears) {
         const yearSlider = document.getElementById('year-slider');
         const years = window.yearSliderYears;
-        let idx = yearSlider ? parseInt(yearSlider.value, 10) : years.length - 1;
-        if (isNaN(idx) || idx < 0 || idx >= years.length) idx = years.length - 1;
-        currentYear = years[idx] || years[years.length - 1];
+        // Set up slider min, max, and value
+        if (yearSlider) {
+            yearSlider.min = 0;
+            yearSlider.max = years.length - 1;
+            // Try to set default to current fiscal year if present
+            const now = new Date();
+            let fyIdx = -1;
+            for (let i = 0; i < years.length; i++) {
+                // Fiscal year string is like '2023-24', so parse the end year
+                const fy = years[i].replace('_', '-');
+                const parts = fy.split('-');
+                if (parts.length === 2) {
+                    let startYear = parseInt(parts[0], 10);
+                    let endYearShort = parseInt(parts[1], 10);
+                    if (!isNaN(startYear) && !isNaN(endYearShort)) {
+                        let century = Math.floor(startYear / 100) * 100;
+                        let endYear = century + endYearShort;
+                        if (endYearShort < (startYear % 100)) endYear += 100;
+                        // Fiscal year ends in June, so if now is before July, use previous FY
+                        let fyEnd = endYear;
+                        let fyStart = startYear;
+                        let fiscalYearForNow = now.getMonth() < 6 ? now.getFullYear() - 1 : now.getFullYear();
+                        if (fyStart === fiscalYearForNow) {
+                            fyIdx = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            let idx = fyIdx !== -1 ? fyIdx : years.length - 1;
+            yearSlider.value = idx;
+            currentYear = years[idx] || years[years.length - 1];
+            // Set the label
+            const yearSliderValue = document.getElementById('year-slider-value');
+            if (yearSliderValue) {
+                let displayYear = currentYear.replace('_','-');
+                const fyParts = displayYear.split('-');
+                let fyEnd = null;
+                if (fyParts.length === 2) {
+                    let startYear = parseInt(fyParts[0], 10);
+                    let endYearShort = parseInt(fyParts[1], 10);
+                    if (!isNaN(startYear) && !isNaN(endYearShort)) {
+                        let century = Math.floor(startYear / 100) * 100;
+                        let endYear = century + endYearShort;
+                        if (endYearShort < (startYear % 100)) endYear += 100;
+                        fyEnd = endYear;
+                    }
+                }
+                if (fyEnd !== null && fyEnd > now.getFullYear()) {
+                    displayYear += ' (estimate)';
+                }
+                yearSliderValue.textContent = displayYear;
+            }
+        }
     }
     initialiseVisualisation();
     setupEventListeners();
+    setupDataTypeSwitch();
 });
+function setupDataTypeSwitch() {
+    const dataTypeSwitch = document.getElementById('data-type-switch');
+    if (!dataTypeSwitch) return;
+    dataTypeSwitch.addEventListener('change', function(e) {
+        if (e.target.value === 'expenses') {
+            window.expenditureData = window.expensesData;
+        } else if (e.target.value === 'revenue') {
+            window.expenditureData = window.revenueData;
+        }
+        // Update year slider and reload data
+        const years = Object.keys(window.expenditureData).sort();
+        window.yearSliderYears = years;
+        const yearSlider = document.getElementById('year-slider');
+        if (yearSlider) {
+            yearSlider.min = 0;
+            yearSlider.max = years.length - 1;
+            let idx = years.indexOf(currentYear);
+            if (idx === -1) idx = years.length - 1;
+            yearSlider.value = idx;
+            currentYear = years[idx];
+        }
+        initialiseVisualisation();
+    });
+}
 
 function setupEventListeners() { 
     const yearSlider = document.getElementById('year-slider');
@@ -300,17 +376,19 @@ function handleMouseOut(event) {
 }
 
 function updateCentreInfo(node) {
-    const value = node.value;
-    document.getElementById('centre-value').textContent = formatCurrency(value);
-    
+    let value;
     if (node.depth === 0) {
+        // At root, use root.value (D3 sum of all descendants)
+        value = root.value;
         document.getElementById('centre-subtitle').textContent = '';
         document.getElementById('centre-info').style.cursor = 'default';
     } else {
+        value = node.value;
         const percentage = formatNumber((value / root.value) * 100, 2);
         document.getElementById('centre-subtitle').textContent = `${percentage}% of budget`;
         document.getElementById('centre-info').style.cursor = 'pointer';
     }
+    document.getElementById('centre-value').textContent = formatCurrency(value);
 }
 
 

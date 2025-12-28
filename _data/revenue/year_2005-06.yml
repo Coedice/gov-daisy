@@ -1,0 +1,45 @@
+name: Australian Government Budget 2005-06
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 112771000000.0
+      children:
+      - name: Gross other individuals
+        budget: 24895000000.0
+      - name: Net income tax
+        budget: 87876000000.0
+    - name: Company tax
+      budget: 48959924967.17
+    - name: Fringe benefits tax
+      budget: 4049000000.0
+    - name: Resource rent taxes
+      budget: 1917000000.0
+    - name: Superannuation taxes
+      budget: 6367506879.66
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 37441701693.34748
+    - name: Wine equalisation tax
+      budget: 656038409.96
+    - name: Luxury car tax
+      budget: 322428176.33
+    - name: Customs and Excise
+      budget: 26301584828.22
+    - name: Primary production taxes
+      budget: 610067000.0
+    - name: Other taxes
+      budget: 1964157280.5311007
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 4360177000.0
+  - name: Interest received
+    budget: 2324869355.0000005
+  - name: Other non-taxation receipts
+    budget: 11231235433.230001

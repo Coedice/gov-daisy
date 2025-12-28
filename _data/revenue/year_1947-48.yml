@@ -1,0 +1,40 @@
+name: Australian Government Budget 1947-48
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 326221950.0
+      children:
+      - name: Individuals income tax - Individuals
+        budget: 183326254.0
+      - name: Individuals income tax - Social services contribution
+        budget: 142895696.0
+      - name: Net income tax
+        budget: 0
+    - name: Company tax
+      budget: 139578160.0
+    - name: Other income tax and withholding tax
+      budget: 33189528.000000004
+      children:
+      - name: Payroll tax
+        budget: 33189528.000000004
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 69457158.0
+    - name: Customs and Excise
+      budget: 231209280.0
+    - name: Primary production taxes
+      budget: 17828878.0
+    - name: Other taxes
+      budget: 28370709.99999999
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 0.0
+  - name: Interest received
+    budget: 0.0
+  - name: Other non-taxation receipts
+    budget: 85954600.0

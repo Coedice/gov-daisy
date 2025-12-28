@@ -1,0 +1,45 @@
+name: Australian Government Budget 1995-96
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 60414000000.0
+      children:
+      - name: Gross PAYE/PAYG withholding
+        budget: 53302000000.0
+      - name: Gross other individuals
+        budget: 9538000000.0
+      - name: Gross prescribed payments system
+        budget: 2059000000.0
+      - name: Medicare Levy
+        budget: 3350000000.0
+      - name: Net income tax
+        budget: -7835000000.0
+    - name: Company tax
+      budget: 18252000000.0
+    - name: Fringe benefits tax
+      budget: 3031000000.0
+    - name: Resource rent taxes
+      budget: 791000000.0
+    - name: Superannuation taxes
+      budget: 1634000000.0
+    - name: Other income tax and withholding tax
+      budget: 1349000000.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 12955000000.0
+    - name: Customs and Excise
+      budget: 15973000000.0
+    - name: Primary production taxes
+      budget: 0.0
+    - name: Other taxes
+      budget: 1988000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Interest received
+    budget: 1403000000.0
+  - name: Other non-taxation receipts
+    budget: 3899000000.0

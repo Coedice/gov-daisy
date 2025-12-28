@@ -1,0 +1,45 @@
+name: Australian Government Budget 2021-22
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 259052000000.0
+      children:
+      - name: Gross other individuals
+        budget: 57432000000.0
+      - name: Net income tax
+        budget: 201621000000.0
+    - name: Company tax
+      budget: 123308000000.0
+    - name: Fringe benefits tax
+      budget: 3331000000.0
+    - name: Resource rent taxes
+      budget: 1638000000.0
+    - name: Superannuation taxes
+      budget: 26546000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 73498000000.0
+    - name: Wine equalisation tax
+      budget: 1100000000.0
+    - name: Luxury car tax
+      budget: 960000000.0
+    - name: Customs and Excise
+      budget: 39126000000.0
+    - name: Primary production taxes
+      budget: 626000000.0
+    - name: Other taxes
+      budget: 7401000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 11564000000.0
+  - name: Interest received
+    budget: 2446000000.0
+  - name: Other non-taxation receipts
+    budget: 33761000000.0

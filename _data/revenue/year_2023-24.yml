@@ -1,0 +1,45 @@
+name: Australian Government Budget 2023-24
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 331512833823.89
+      children:
+      - name: Gross other individuals
+        budget: 74198707190.06999
+      - name: Net income tax
+        budget: 257314126633.82
+    - name: Company tax
+      budget: 141176864410.12
+    - name: Fringe benefits tax
+      budget: 4631851625.830001
+    - name: Resource rent taxes
+      budget: 1144281956.4800003
+    - name: Superannuation taxes
+      budget: 12465223543.05
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 85031292485.36
+    - name: Wine equalisation tax
+      budget: 1091185906.26
+    - name: Luxury car tax
+      budget: 1252742270.2600002
+    - name: Customs and Excise
+      budget: 43513513286.31004
+    - name: Primary production taxes
+      budget: 637326000.0
+    - name: Other taxes
+      budget: 10943335692.439962
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 6412240000.0
+  - name: Interest received
+    budget: 10509154000.0
+  - name: Other non-taxation receipts
+    budget: 38263587000.0

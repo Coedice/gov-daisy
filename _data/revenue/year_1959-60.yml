@@ -1,0 +1,38 @@
+name: Australian Government Budget 1959-60
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 884328000.0
+      children:
+      - name: Individuals income tax - Individuals
+        budget: 884328000.0
+      - name: Net income tax
+        budget: 0
+    - name: Company tax
+      budget: 458260000.0
+    - name: Other income tax and withholding tax
+      budget: 110324000.0
+      children:
+      - name: Payroll tax
+        budget: 110324000.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 328370000.0
+    - name: Customs and Excise
+      budget: 672984000.0
+    - name: Primary production taxes
+      budget: 0.0
+    - name: Other taxes
+      budget: 32375999.999999978
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 5284000.0
+  - name: Interest received
+    budget: 26552000.0
+  - name: Other non-taxation receipts
+    budget: 358094000.0

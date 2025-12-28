@@ -1,0 +1,36 @@
+name: Australian Government Budget 1970-71
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 3178137000.0
+      children:
+      - name: Gross PAYE/PAYG withholding
+        budget: 2939073000.0
+      - name: Other
+        budget: 746075000.0
+      - name: Net income tax
+        budget: -507011000.0
+    - name: Company tax
+      budget: 1395389000.0
+    - name: Other income tax and withholding tax
+      budget: 343702000.0
+      children:
+      - name: Payroll tax
+        budget: 295428000.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 633159000.0
+    - name: Customs and Excise
+      budget: 1519032000.0
+    - name: Primary production taxes
+      budget: 0.0
+    - name: Other taxes
+      budget: 80519000.00000012
+- name: Non-taxation receipts
+  children:
+  - name: Other non-taxation receipts
+    budget: 880291000.0

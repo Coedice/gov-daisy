@@ -1,0 +1,38 @@
+name: Australian Government Budget 1944-45
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 311364484.0
+      children:
+      - name: Individuals income tax - Individuals
+        budget: 311364484.0
+      - name: Net income tax
+        budget: 0
+    - name: Company tax
+      budget: 119703590.0
+    - name: Other income tax and withholding tax
+      budget: 22176176.0
+      children:
+      - name: Payroll tax
+        budget: 22176176.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 59343604.0
+    - name: Customs and Excise
+      budget: 134353342.0
+    - name: Primary production taxes
+      budget: 4141934.0
+    - name: Other taxes
+      budget: 24906388.000000022
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 0.0
+  - name: Interest received
+    budget: 0.0
+  - name: Other non-taxation receipts
+    budget: 77701346.0

@@ -1,0 +1,45 @@
+name: Australian Government Budget 2017-18
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 206993000000.0
+      children:
+      - name: Gross other individuals
+        budget: 43866000000.0
+      - name: Net income tax
+        budget: 163127000000.0
+    - name: Company tax
+      budget: 84591000000.0
+    - name: Fringe benefits tax
+      budget: 3911000000.0
+    - name: Resource rent taxes
+      budget: 1116000000.0
+    - name: Superannuation taxes
+      budget: 10804000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 63235000000.0
+    - name: Wine equalisation tax
+      budget: 894000000.0
+    - name: Luxury car tax
+      budget: 695000000.0
+    - name: Customs and Excise
+      budget: 38356000000.0
+    - name: Primary production taxes
+      budget: 555000000.0
+    - name: Other taxes
+      budget: 6903000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 5407000000.0
+  - name: Interest received
+    budget: 3433000000.0
+  - name: Other non-taxation receipts
+    budget: 20013000000.0

@@ -1,0 +1,45 @@
+name: Australian Government Budget 2010-11
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 132738000000.0
+      children:
+      - name: Gross other individuals
+        budget: 27795000000.0
+      - name: Net income tax
+        budget: 104943000000.0
+    - name: Company tax
+      budget: 56262000000.0
+    - name: Fringe benefits tax
+      budget: 3303000000.0
+    - name: Resource rent taxes
+      budget: 806000000.0
+    - name: Superannuation taxes
+      budget: 6519000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 46083000000.0
+    - name: Wine equalisation tax
+      budget: 722000000.0
+    - name: Luxury car tax
+      budget: 483000000.0
+    - name: Customs and Excise
+      budget: 31184000000.0
+    - name: Primary production taxes
+      budget: 445000000.0
+    - name: Other taxes
+      budget: 3559000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 0.0
+  - name: Interest received
+    budget: 4943000000.0
+  - name: Other non-taxation receipts
+    budget: 14975000000.0

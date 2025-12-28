@@ -20,14 +20,20 @@ title: Government Expenditure Visualiser
     </header>
 
     <main class="container">
+
         <div class="controls">
             <div class="control-group">
                 <label for="year-slider">Fiscal Year:</label>
                 <input type="range" id="year-slider" min="0" max="0" step="1">
                 <span id="year-slider-value"></span>
             </div>
-
-            <!-- View mode selector removed: Only Budgeted Amount is shown -->
+            <div class="control-group">
+                <label for="data-type-switch">Show:</label>
+                <select id="data-type-switch">
+                    <option value="expenses">Expenses</option>
+                    <option value="revenue">Revenue</option>
+                </select>
+            </div>
         </div>
 
         <div id="visualisation-container">
@@ -49,73 +55,33 @@ title: Government Expenditure Visualiser
     <script>
     // DEBUG: site.data keys: {{ site.data | keys | join: ', ' }}
     </script>
-        {% assign valid_years = '' | split: ',' %}
-        {% for pair in site.data %}
+        {% assign expenses_years = '' | split: ',' %}
+        {% assign revenue_years = '' | split: ',' %}
+        {% for pair in site.data.expenses %}
             {% assign k = pair[0] %}
             {% if k contains 'year_' %}
-                {% assign valid_years = valid_years | push: k %}
+                {% assign expenses_years = expenses_years | push: k %}
+            {% endif %}
+        {% endfor %}
+        {% for pair in site.data.revenue %}
+            {% assign k = pair[0] %}
+            {% if k contains 'year_' %}
+                {% assign revenue_years = revenue_years | push: k %}
             {% endif %}
         {% endfor %}
         <script>
-        // DEBUG: valid_years = [{{ valid_years | join: ', ' }}]
+        // DEBUG: expenses_years = [{{ expenses_years | join: ', ' }}]
+        // DEBUG: revenue_years = [{{ revenue_years | join: ', ' }}]
         </script>
-        {% capture jsdata %}{% assign comma = '' %}{% for y in valid_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
+        {% capture jsdata_expenses %}{% assign comma = '' %}{% for y in expenses_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.expenses[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
+        {% capture jsdata_revenue %}{% assign comma = '' %}{% for y in revenue_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.revenue[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
     <script>
-        // Embed Jekyll data as JavaScript objects (all per-year files in _data/)
-        // If Liquid is not processed, fallback to empty object to avoid JS errors
-        window.expenditureData = window.expenditureData || {};
-        {% if jsdata and jsdata != '' %}
-        window.expenditureData = { {{ jsdata }} };
-        {% else %}
-        window.expenditureData = {};
-        {% endif %}
-        // Populate year selector with all available years (format: 2024-25)
-        const yearSelect = document.getElementById('year-select');
-        const yearSlider = document.getElementById('year-slider');
-        const yearSliderValue = document.getElementById('year-slider-value');
-        if (yearSlider && yearSliderValue) {
-            const years = Object.keys(window.expenditureData).sort();
-            yearSlider.min = 0;
-            yearSlider.max = years.length - 1;
-            // Default to current financial year (latest)
-            let defaultIndex = years.length - 1;
-            // Try to find the year matching the current date
-            const now = new Date();
-            const thisYear = now.getFullYear();
-            const thisMonth = now.getMonth();
-            // Financial year starts July (month 6)
-            let fyString = '';
-            if (thisMonth >= 6) {
-                fyString = `${thisYear}-${(thisYear+1).toString().slice(-2)}`;
-            } else {
-                fyString = `${thisYear-1}-${thisYear.toString().slice(-2)}`;
-            }
-            const fyIndex = years.findIndex(y => y.replace('_','-') === fyString);
-            if (fyIndex !== -1) defaultIndex = fyIndex;
-            yearSlider.value = defaultIndex;
-            // Show (estimate) for future years
-            let displayYear = years[defaultIndex].replace('_','-');
-            const fyParts = displayYear.split('-');
-            let fyEnd = null;
-            if (fyParts.length === 2) {
-                // Use the start year to determine the century
-                let startYear = parseInt(fyParts[0], 10);
-                let endYearShort = parseInt(fyParts[1], 10);
-                if (!isNaN(startYear) && !isNaN(endYearShort)) {
-                    let century = Math.floor(startYear / 100) * 100;
-                    // If endYearShort < startYear % 100, it's next century
-                    let endYear = century + endYearShort;
-                    if (endYearShort < (startYear % 100)) endYear += 100;
-                    fyEnd = endYear;
-                }
-            }
-            if (fyEnd !== null && fyEnd > now.getFullYear()) {
-                displayYear += ' (estimate)';
-            }
-            yearSliderValue.textContent = displayYear;
-            // Store years array globally for JS
-            window.yearSliderYears = years;
-        }
+        // Embed Jekyll data as JavaScript objects (all per-year files in _data/expenses/ and _data/revenue/)
+        window.expensesData = { {{ jsdata_expenses }} };
+        window.revenueData = { {{ jsdata_revenue }} };
+        // Default to expenses
+        window.expenditureData = window.expensesData;
+        window.yearSliderYears = Object.keys(window.expenditureData).sort();
     </script>
     <script src="{{ '/assets/js/visualisation.js' | relative_url }}"></script>
 </body>

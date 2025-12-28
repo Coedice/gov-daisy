@@ -1,0 +1,45 @@
+name: Australian Government Budget 2008-09
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 122360000000.0
+      children:
+      - name: Gross other individuals
+        budget: 30030000000.0
+      - name: Net income tax
+        budget: 92330000000.0
+    - name: Company tax
+      budget: 60391000000.0
+    - name: Fringe benefits tax
+      budget: 3399000000.0
+    - name: Resource rent taxes
+      budget: 2184000000.0
+    - name: Superannuation taxes
+      budget: 9217000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 41335000000.0
+    - name: Wine equalisation tax
+      budget: 693000000.0
+    - name: Luxury car tax
+      budget: 393000000.0
+    - name: Customs and Excise
+      budget: 30188000000.0
+    - name: Primary production taxes
+      budget: 620000000.0
+    - name: Other taxes
+      budget: 2894000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 0.0
+  - name: Interest received
+    budget: 5166000000.0
+  - name: Other non-taxation receipts
+    budget: 13760000000.0

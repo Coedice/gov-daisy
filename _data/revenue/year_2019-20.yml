@@ -1,0 +1,45 @@
+name: Australian Government Budget 2019-20
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 221920000000.0
+      children:
+      - name: Gross other individuals
+        budget: 43713000000.0
+      - name: Net income tax
+        budget: 178207000000.0
+    - name: Company tax
+      budget: 84781000000.0
+    - name: Fringe benefits tax
+      budget: 3850000000.0
+    - name: Resource rent taxes
+      budget: 1052000000.0
+    - name: Superannuation taxes
+      budget: 6267000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 60263000000.0
+    - name: Wine equalisation tax
+      budget: 959000000.0
+    - name: Luxury car tax
+      budget: 570000000.0
+    - name: Customs and Excise
+      budget: 43147000000.0
+    - name: Primary production taxes
+      budget: 469000000.0
+    - name: Other taxes
+      budget: 8497000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 7007000000.0
+  - name: Interest received
+    budget: 3244000000.0
+  - name: Other non-taxation receipts
+    budget: 27373000000.0

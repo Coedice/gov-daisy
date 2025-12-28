@@ -1,0 +1,41 @@
+name: Australian Government Budget 2000-01
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 77246000000.0
+      children:
+      - name: Gross other individuals
+        budget: 13226000000.0
+      - name: Net income tax
+        budget: 64020000000.0
+    - name: Company tax
+      budget: 31582000000.0
+    - name: Fringe benefits tax
+      budget: 3207000000.0
+    - name: Resource rent taxes
+      budget: 2379000000.0
+    - name: Superannuation taxes
+      budget: 4800000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 23776832112.0
+    - name: Sales tax
+      budget: 1929000000.0
+    - name: Customs and Excise
+      budget: 23601000000.0
+    - name: Primary production taxes
+      budget: 451000000.0
+    - name: Other taxes
+      budget: 862000000.0000037
+- name: Non-taxation receipts
+  children:
+  - name: Interest received
+    budget: 1140000000.0
+  - name: Other non-taxation receipts
+    budget: 13651000000.0

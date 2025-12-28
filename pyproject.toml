@@ -1,7 +1,7 @@
 [project]
 name = "gov-daisy"
 version = "0.1.0"
-description = "Australian government expenditure visualiser data tools"
+description = "Gov Daisy"
 requires-python = ">=3.8"
 dependencies = [
     "openpyxl>=3.1.5",

@@ -1,0 +1,45 @@
+name: Australian Government Budget 2025-26
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 349700000000.0
+      children:
+      - name: Gross other individuals
+        budget: 79900000000.0
+      - name: Net income tax
+        budget: 269800000000.0
+    - name: Company tax
+      budget: 140400000000.0
+    - name: Fringe benefits tax
+      budget: 5080000000.0
+    - name: Resource rent taxes
+      budget: 1950000000.0
+    - name: Superannuation taxes
+      budget: 25560000000.0
+    - name: Other income tax and withholding tax
+      budget: 0.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Goods and services tax
+      budget: 94234000000.0
+    - name: Wine equalisation tax
+      budget: 1200000000.0
+    - name: Luxury car tax
+      budget: 1200000000.0
+    - name: Customs and Excise
+      budget: 43800000000.0
+    - name: Primary production taxes
+      budget: 669000000.0
+    - name: Other taxes
+      budget: 12293000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 7416000000.0
+  - name: Interest received
+    budget: 9389000000.0
+  - name: Other non-taxation receipts
+    budget: 42461000000.0

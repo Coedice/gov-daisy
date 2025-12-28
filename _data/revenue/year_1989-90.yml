@@ -1,0 +1,45 @@
+name: Australian Government Budget 1989-90
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 50019000000.0
+      children:
+      - name: Gross PAYE/PAYG withholding
+        budget: 41322000000.0
+      - name: Gross other individuals
+        budget: 7652000000.0
+      - name: Gross prescribed payments system
+        budget: 1734000000.0
+      - name: Medicare Levy
+        budget: 2545000000.0
+      - name: Net income tax
+        budget: -3234000000.0
+    - name: Company tax
+      budget: 12926000000.0
+    - name: Fringe benefits tax
+      budget: 1168000000.0
+    - name: Resource rent taxes
+      budget: 42000000.0
+    - name: Superannuation taxes
+      budget: 376000000.0
+    - name: Other income tax and withholding tax
+      budget: 915000000.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 10132000000.0
+    - name: Customs and Excise
+      budget: 13849000000.0
+    - name: Primary production taxes
+      budget: 0.0
+    - name: Other taxes
+      budget: 1816000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Interest received
+    budget: 3470000000.0
+  - name: Other non-taxation receipts
+    budget: 1157000000.0

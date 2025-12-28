@@ -1,0 +1,38 @@
+name: Australian Government Budget 1964-65
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 1569483000.0
+      children:
+      - name: Individuals income tax - Individuals
+        budget: 1569483000.0
+      - name: Net income tax
+        budget: 0
+    - name: Company tax
+      budget: 709044000.0
+    - name: Other income tax and withholding tax
+      budget: 166117000.0
+      children:
+      - name: Payroll tax
+        budget: 150078000.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 362857000.0
+    - name: Customs and Excise
+      budget: 899642000.0
+    - name: Primary production taxes
+      budget: 19515000.0
+    - name: Other taxes
+      budget: 51181999.99999973
+- name: Non-taxation receipts
+  children:
+  - name: Dividends
+    budget: 5118000.0
+  - name: Interest received
+    budget: 48394000.0
+  - name: Other non-taxation receipts
+    budget: 588131000.0

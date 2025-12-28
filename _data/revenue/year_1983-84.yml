@@ -1,0 +1,37 @@
+name: Australian Government Budget 1983-84
+children:
+- name: Taxation receipts
+  children:
+  - name: Income taxation receipts
+    children:
+    - name: Individuals and other withholding taxes
+      budget: 24711000000.0
+      children:
+      - name: Gross PAYE/PAYG withholding
+        budget: 22024000000.0
+      - name: Gross other individuals
+        budget: 4474000000.0
+      - name: Gross prescribed payments system
+        budget: 251000000.0
+      - name: Medicare Levy
+        budget: 365000000.0
+      - name: Net income tax
+        budget: -2403000000.0
+    - name: Company tax
+      budget: 4383000000.0
+    - name: Other income tax and withholding tax
+      budget: 557000000.0
+  - name: Indirect taxation receipts
+    children:
+    - name: Sales tax
+      budget: 4165000000.0
+    - name: Customs and Excise
+      budget: 10129000000.0
+    - name: Primary production taxes
+      budget: 0.0
+    - name: Other taxes
+      budget: 554000000.0
+- name: Non-taxation receipts
+  children:
+  - name: Other non-taxation receipts
+    budget: 4112000000.0
