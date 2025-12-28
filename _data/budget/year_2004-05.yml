@@ -29,7 +29,6 @@ children:
   - name: Vocational and other education
     budget: 1446000000.0
   - name: Schools
-    budget: 7394000000.0
     children:
     - name: Non-government schools
       budget: 4990000000.0
@@ -48,19 +47,18 @@ children:
   - name: Pharmaceutical benefits and services
     budget: 7073000000.0
   - name: National healthcare specific purpose payment
-    budget: 9375000000.0
     children:
     - name: Hospital services
       budget: 1386000000.0
     - name: Health care agreements
       budget: 7989000000.0
   - name: Health services
-    budget: 3116000000.0
     children:
     - name: Health services
       budget: 1402000000.0
     - name: Other health services
       budget: 1713000000.0
+    budget: 3116000000.0
   - name: General administration
     budget: 566000000.0
   - name: Health assistance to the aged
@@ -78,7 +76,6 @@ children:
   - name: Assistance to families with children
     budget: 25182000000.0
   - name: Assistance to the unemployed and the sick
-    budget: 5219000000.0
     children:
     - name: Assistance to the unemployed
       budget: 5128000000.0
@@ -151,7 +148,6 @@ children:
 - name: Other economic affairs
   children:
   - name: Tourism and area promotion
-    budget: 218000000.0
     children:
     - name: Vocational and industry training
       budget: 610000000.0
@@ -161,12 +157,12 @@ children:
       budget: 388000000.0
     - name: Immigration
       budget: 757000000.0
+    budget: 218000000.0
   - name: Other economic affairs nec
     budget: 759000000.0
 - name: Other purposes
   children:
   - name: Public debt interest
-    budget: 3880000000.0
     children:
     - name: Interest on Commonwealth Government's behalf
       budget: 3869000000.0
@@ -177,7 +173,6 @@ children:
   - name: Nominal superannuation interest
     budget: 5005000000.0
   - name: General purpose inter-government transactions
-    budget: 3003000000.0
     children:
     - name: General revenue assistance - States and Territories
       budget: 739000000.0
@@ -191,6 +186,7 @@ children:
       budget: 160000000.0
     - name: Assistance to other governments
       budget: 551000000.0
+    budget: 3003000000.0
   - name: Natural disaster relief
     budget: 77000000.0
   - name: Contingency reserve

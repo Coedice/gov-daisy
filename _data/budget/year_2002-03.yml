@@ -29,12 +29,12 @@ children:
   - name: Vocational and other education
     budget: 1323000000.0
   - name: Schools
-    budget: 6013000000.0
     children:
     - name: Non-government schools
       budget: 3869000000.0
     - name: Government schools
       budget: 2143000000.0
+    budget: 6013000000.0
   - name: School education - specific funding
     budget: 115000000.0
   - name: Student assistance
@@ -48,14 +48,13 @@ children:
   - name: Pharmaceutical benefits and services
     budget: 5732000000.0
   - name: National healthcare specific purpose payment
-    budget: 8776000000.0
     children:
     - name: Hospital services
       budget: 1537000000.0
     - name: Health care agreements
       budget: 7240000000.0
+    budget: 8776000000.0
   - name: Health services
-    budget: 1559000000.0
     children:
     - name: Health services
       budget: 667000000.0
@@ -78,7 +77,6 @@ children:
   - name: Assistance to families with children
     budget: 19595000000.0
   - name: Assistance to the unemployed and the sick
-    budget: 5651000000.0
     children:
     - name: Assistance to the unemployed
       budget: 5565000000.0
@@ -151,7 +149,6 @@ children:
 - name: Other economic affairs
   children:
   - name: Tourism and area promotion
-    budget: 156000000.0
     children:
     - name: Vocational and industry training
       budget: 491000000.0
@@ -161,12 +158,12 @@ children:
       budget: 270000000.0
     - name: Immigration
       budget: 705000000.0
+    budget: 156000000.0
   - name: Other economic affairs nec
     budget: 642000000.0
 - name: Other purposes
   children:
   - name: Public debt interest
-    budget: 4629000000.0
     children:
     - name: Interest on Commonwealth Government's behalf
       budget: 4602000000.0
@@ -177,7 +174,6 @@ children:
   - name: Nominal superannuation interest
     budget: 5409000000.0
   - name: General purpose inter-government transactions
-    budget: 3598000000.0
     children:
     - name: General revenue assistance - States and Territories
       budget: 1537000000.0

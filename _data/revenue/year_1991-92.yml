@@ -5,7 +5,6 @@ children:
   - name: Income taxation receipts
     children:
     - name: Individuals and other withholding taxes
-      budget: 46542000000.0
       children:
       - name: Gross PAYE/PAYG withholding
         budget: 41388000000.0

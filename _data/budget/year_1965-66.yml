@@ -29,7 +29,6 @@ children:
   - name: Vocational and other education
     budget: 9000000.0
   - name: Schools
-    budget: 24000000.0
     children:
     - name: Non-government schools
       budget: 3000000.0
@@ -122,7 +121,6 @@ children:
 - name: Other economic affairs
   children:
   - name: Tourism and area promotion
-    budget: 1000000.0
     children:
     - name: Vocational and industry training
       budget: 0.0
@@ -132,22 +130,22 @@ children:
       budget: 30000000.0
     - name: Other outlays
       budget: 16000000.0
+    budget: 1000000.0
   - name: Other economic affairs nec
     budget: 61000000.0
 - name: Other purposes
   children:
   - name: Public debt interest - net of interest received on Commonwealth Government
       stock
-    budget: 409000000.0
     children:
     - name: Public debt interest - gross interest
       budget: 456000000.0
+    budget: 409000000.0
   - name: Public debt interest
     children:
     - name: Interest received on Commonwealth Government stock
       budget: -46000000.0
   - name: General purpose inter-government transactions
-    budget: 1237000000.0
     children:
     - name: General revenue assistance - States and Territories
       budget: 799000000.0

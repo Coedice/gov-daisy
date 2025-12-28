@@ -29,7 +29,6 @@ children:
   - name: Vocational and other education
     budget: 1562000000.0
   - name: Schools
-    budget: 8748000000.0
     children:
     - name: Non-government schools
       budget: 5677000000.0
@@ -50,7 +49,6 @@ children:
   - name: National healthcare specific purpose payment
     budget: 10416000000.0
   - name: Health services
-    budget: 3622000000.0
     children:
     - name: Health services
       budget: 1320000000.0
@@ -73,12 +71,12 @@ children:
   - name: Assistance to families with children
     budget: 27810000000.0
   - name: Assistance to the unemployed and the sick
-    budget: 4799000000.0
     children:
     - name: Assistance to the unemployed
       budget: 4713000000.0
     - name: Assistance to the sick
       budget: 85000000.0
+    budget: 4799000000.0
   - name: Common youth allowance
     budget: 2074000000.0
   - name: Other welfare programmes
@@ -146,7 +144,6 @@ children:
 - name: Other economic affairs
   children:
   - name: Tourism and area promotion
-    budget: 196000000.0
     children:
     - name: Vocational and industry training
       budget: 704000000.0
@@ -156,12 +153,12 @@ children:
       budget: 303000000.0
     - name: Immigration
       budget: 1105000000.0
+    budget: 196000000.0
   - name: Other economic affairs nec
     budget: 934000000.0
 - name: Other purposes
   children:
   - name: Public debt interest
-    budget: 3592000000.0
     children:
     - name: Interest on Commonwealth Government's behalf
       budget: 3592000000.0
@@ -172,7 +169,6 @@ children:
   - name: Nominal superannuation interest
     budget: 5470000000.0
   - name: General purpose inter-government transactions
-    budget: 42133000000.0
     children:
     - name: General revenue assistance - States and Territories
       budget: 39560000000.0

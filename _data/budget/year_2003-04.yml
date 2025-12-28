@@ -29,12 +29,12 @@ children:
   - name: Vocational and other education
     budget: 1332000000.0
   - name: Schools
-    budget: 6735000000.0
     children:
     - name: Non-government schools
       budget: 4452000000.0
     - name: Government schools
       budget: 2284000000.0
+    budget: 6735000000.0
   - name: School education - specific funding
     budget: 130000000.0
   - name: Student assistance
@@ -48,19 +48,19 @@ children:
   - name: Pharmaceutical benefits and services
     budget: 6752000000.0
   - name: National healthcare specific purpose payment
-    budget: 9110000000.0
     children:
     - name: Hospital services
       budget: 1599000000.0
     - name: Health care agreements
       budget: 7512000000.0
+    budget: 9110000000.0
   - name: Health services
-    budget: 2111000000.0
     children:
     - name: Health services
       budget: 963000000.0
     - name: Other health services
       budget: 1149000000.0
+    budget: 2111000000.0
   - name: General administration
     budget: 506000000.0
   - name: Health assistance to the aged
@@ -78,7 +78,6 @@ children:
   - name: Assistance to families with children
     budget: 24993000000.0
   - name: Assistance to the unemployed and the sick
-    budget: 5529000000.0
     children:
     - name: Assistance to the unemployed
       budget: 5443000000.0
@@ -151,7 +150,6 @@ children:
 - name: Other economic affairs
   children:
   - name: Tourism and area promotion
-    budget: 135000000.0
     children:
     - name: Vocational and industry training
       budget: 624000000.0
@@ -161,12 +159,12 @@ children:
       budget: 277000000.0
     - name: Immigration
       budget: 753000000.0
+    budget: 135000000.0
   - name: Other economic affairs nec
     budget: 748000000.0
 - name: Other purposes
   children:
   - name: Public debt interest
-    budget: 4001000000.0
     children:
     - name: Interest on Commonwealth Government's behalf
       budget: 3982000000.0
@@ -177,7 +175,6 @@ children:
   - name: Nominal superannuation interest
     budget: 4898000000.0
   - name: General purpose inter-government transactions
-    budget: 2775000000.0
     children:
     - name: General revenue assistance - States and Territories
       budget: 647000000.0

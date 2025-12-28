@@ -5,7 +5,6 @@ children:
   - name: Income taxation receipts
     children:
     - name: Individuals and other withholding taxes
-      budget: 311364484.0
       children:
       - name: Individuals income tax - Individuals
         budget: 311364484.0
@@ -14,7 +13,6 @@ children:
     - name: Company tax
       budget: 119703590.0
     - name: Other income tax and withholding tax
-      budget: 22176176.0
       children:
       - name: Payroll tax
         budget: 22176176.0

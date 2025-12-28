@@ -125,12 +125,12 @@ def export_yearly_yaml(
     def filter_for_year(node: dict, year: str, unit: str = None) -> dict | None:
         """
         Recursively filter the tree for a specific year, removing excluded nodes and keeping only relevant budget data.
+        If a node's value is simply the sum of its children's values, omit the value from the parent node.
         """
         if should_exclude(node["name"], node.get("unit", unit)):
             return None
         new_node = {"name": node["name"]}
-        if "budget" in node and year in node["budget"]:
-            new_node["budget"] = node["budget"][year]
+        children = []
         if node.get("children"):
             children = [
                 filter_for_year(child, year, child.get("unit", unit))
@@ -141,6 +141,17 @@ def export_yearly_yaml(
             ]
             if children:
                 new_node["children"] = children
+        # Only add budget if not just the sum of children
+        if "budget" in node and year in node["budget"]:
+            parent_val = node["budget"][year]
+            # Check if children all have budget values for this year
+            if children and all("budget" in c and isinstance(c["budget"], (int, float)) for c in children):
+                children_sum = sum(c["budget"] for c in children if "budget" in c and isinstance(c["budget"], (int, float)))
+                # If parent's value is not exactly the sum of its children, keep it
+                if abs(parent_val - children_sum) > 1e-6:
+                    new_node["budget"] = parent_val
+            else:
+                new_node["budget"] = parent_val
         return new_node
 
     def add_siblings(node: dict) -> None:

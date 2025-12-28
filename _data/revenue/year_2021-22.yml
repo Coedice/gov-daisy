@@ -5,12 +5,12 @@ children:
   - name: Income taxation receipts
     children:
     - name: Individuals and other withholding taxes
-      budget: 259052000000.0
       children:
       - name: Gross other individuals
         budget: 57432000000.0
       - name: Net income tax
         budget: 201621000000.0
+      budget: 259052000000.0
     - name: Company tax
       budget: 123308000000.0
     - name: Fringe benefits tax

@@ -29,7 +29,6 @@ children:
   - name: Vocational and other education
     budget: 1823000000.0
   - name: Schools
-    budget: 14706000000.0
     children:
     - name: Non-government schools
       budget: 9474000000.0
@@ -136,7 +135,6 @@ children:
 - name: Other economic affairs
   children:
   - name: Tourism and area promotion
-    budget: 186000000.0
     children:
     - name: Vocational and industry training
       budget: 1288000000.0
@@ -146,24 +144,24 @@ children:
       budget: 811000000.0
     - name: Immigration
       budget: 4036000000.0
+    budget: 186000000.0
   - name: Other economic affairs nec
     budget: 2151000000.0
 - name: Other purposes
   children:
   - name: Public debt interest
-    budget: 14491000000.0
     children:
     - name: Interest on Commonwealth Government's behalf
       budget: 14491000000.0
   - name: Nominal superannuation interest
     budget: 8999000000.0
   - name: General purpose inter-government transactions
-    budget: 58859000000.0
     children:
     - name: General revenue assistance - States and Territories
       budget: 55425000000.0
     - name: Local government assistance
       budget: 3433000000.0
+    budget: 58859000000.0
   - name: Natural disaster relief
     budget: 522000000.0
   - name: Contingency reserve

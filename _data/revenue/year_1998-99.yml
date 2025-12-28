@@ -5,7 +5,6 @@ children:
   - name: Income taxation receipts
     children:
     - name: Individuals and other withholding taxes
-      budget: 76728488278.84003
       children:
       - name: Gross PAYE/PAYG withholding
         budget: 71156779520.04001
@@ -15,6 +14,7 @@ children:
         budget: 2793774256.8700004
       - name: Net income tax
         budget: -10324900000.0
+      budget: 76728488278.84003
     - name: Company tax
       budget: 20733525685.25
     - name: Fringe benefits tax

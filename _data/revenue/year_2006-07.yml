@@ -5,7 +5,6 @@ children:
   - name: Income taxation receipts
     children:
     - name: Individuals and other withholding taxes
-      budget: 115771000000.0
       children:
       - name: Gross other individuals
         budget: 25797000000.0
