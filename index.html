@@ -2,84 +2,49 @@
 layout: default
 title: Gov Daisy
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ site.title }}</title>
-    <link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-</head>
-<body>
-    <header>
-        <div class="container">
-            <h1>Gov Daisy</h1>
-            <p class="subtitle">Interactive visualisation of federal budget allocations and spending</p>
+<main class="container">
+    <div class="controls">
+        <div class="control-group">
+            <label for="year-slider">Fiscal Year:</label>
+            <input type="range" id="year-slider" min="0" max="0" step="1">
+            <span id="year-slider-value"></span>
         </div>
-    </header>
-
-    <main class="container">
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="year-slider">Fiscal Year:</label>
-                <input type="range" id="year-slider" min="0" max="0" step="1">
-                <span id="year-slider-value"></span>
-            </div>
-            <div class="control-group">
-                <label for="data-type-switch">Show:</label>
-                <select id="data-type-switch">
-                    <option value="budget">Budget</option>
-                    <option value="revenue">Revenue</option>
-                </select>
-            </div>
+        <div class="control-group">
+            <label for="data-type-switch">Show:</label>
+            <select id="data-type-switch">
+                <option value="budget">Budget</option>
+                <option value="revenue">Revenue</option>
+            </select>
         </div>
+    </div>
+    <div id="visualisation-container">
+        <svg id="sunburst"></svg>
+        <div id="tooltip" class="tooltip"></div>
+    </div>
+</main>
+{% assign budget_years = '' | split: ',' %}
+{% assign revenue_years = '' | split: ',' %}
+{% for pair in site.data.budget %}
+    {% assign k = pair[0] %}
+    {% if k contains 'year_' %}
+        {% assign budget_years = budget_years | push: k %}
+    {% endif %}
+{% endfor %}
+{% for pair in site.data.revenue %}
+    {% assign k = pair[0] %}
+    {% if k contains 'year_' %}
+        {% assign revenue_years = revenue_years | push: k %}
+    {% endif %}
+{% endfor %}
+{% capture jsdata_budget %}{% assign comma = '' %}{% for y in budget_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.budget[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
+{% capture jsdata_revenue %}{% assign comma = '' %}{% for y in revenue_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.revenue[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
+<script>
+    // Embed Jekyll data as JavaScript objects (all per-year files in _data/budget/ and _data/revenue/)
+    window.budgetData = { {{ jsdata_budget }} };
+    window.revenueData = { {{ jsdata_revenue }} };
 
-        <div id="visualisation-container">
-            <svg id="sunburst"></svg>
-            <div id="tooltip" class="tooltip"></div>
-        
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>Copyright &copy; 2025 <a href="https://gavindou.ch" target="_blank" rel="noopener">Gavin Douch</a></p>
-        </div>
-    </footer>
-
-    <script>
-    // DEBUG: site.data keys: {{ site.data | keys | join: ', ' }}
-    </script>
-        {% assign budget_years = '' | split: ',' %}
-        {% assign revenue_years = '' | split: ',' %}
-        {% for pair in site.data.budget %}
-            {% assign k = pair[0] %}
-            {% if k contains 'year_' %}
-                {% assign budget_years = budget_years | push: k %}
-            {% endif %}
-        {% endfor %}
-        {% for pair in site.data.revenue %}
-            {% assign k = pair[0] %}
-            {% if k contains 'year_' %}
-                {% assign revenue_years = revenue_years | push: k %}
-            {% endif %}
-        {% endfor %}
-        <script>
-        // DEBUG: budget_years = [{{ budget_years | join: ', ' }}]
-        // DEBUG: revenue_years = [{{ revenue_years | join: ', ' }}]
-        </script>
-        {% capture jsdata_budget %}{% assign comma = '' %}{% for y in budget_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.budget[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
-        {% capture jsdata_revenue %}{% assign comma = '' %}{% for y in revenue_years %}{{ comma }}"{{ y | remove: 'year_' }}": {{ site.data.revenue[y] | jsonify }}{% assign comma = ',' %}{% endfor %}{% endcapture %}
-    <script>
-        // Embed Jekyll data as JavaScript objects (all per-year files in _data/budget/ and _data/revenue/)
-        window.budgetData = { {{ jsdata_budget }} };
-        window.revenueData = { {{ jsdata_revenue }} };
-        // Default to budget
-        window.expenditureData = window.budgetData;
-        window.yearSliderYears = Object.keys(window.expenditureData).sort();
-    </script>
-    <script src="{{ '/assets/js/visualisation.js' | relative_url }}"></script>
-</body>
-</html>
+    // Default to budget
+    window.expenditureData = window.budgetData;
+    window.yearSliderYears = Object.keys(window.expenditureData).sort();
+</script>
+<script src="{{ '/assets/js/visualisation.js' | relative_url }}"></script>
