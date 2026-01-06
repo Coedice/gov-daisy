@@ -1,15 +1,14 @@
 # Gov Daisy
 
-An interactive circular/sunburst visualisation of the Australian federal budget, inspired by DaisyDisk.
+An interactive circular/sunburst visualisation of the Australian federal budgets and revenues, inspired by DaisyDisk.
 
 ## Features
 
 - **Interactive Sunburst Chart**: Click segments to zoom in and explore spending categories
-- **Detailed Tooltips**: Hover to see exact amounts and percentages
+- **Detailed Tooltips**: Hover to see amounts and percentages
 - **Year Comparison**: Switch between fiscal years to analyse trends
 - **Search & Filter**: Find specific spending items across all categories
-- **Budget vs Actual**: Compare planned budget with actual spending
-- **Export Data**: Download data for research and analysis
+- **Budget and revenue**: Compare planned budget with actual spending
 
 ## Running Locally
 
@@ -19,15 +18,11 @@ make build
 
 Open your browser to `http://0.0.0.0:8080/`
 
-## Data Structure
-
-Government spending data is stored in `_data/expenditure/` as YAML files, with one file per fiscal year. Jekyll automatically parses these YAML files and makes them available to the visualisation.
-
 ## Technologies
 
 - Jekyll for static site generation
 - D3.js for data visualisation
-- Pure CSS for styling
+- SCSS for styling
 
 ## Data Source
 
