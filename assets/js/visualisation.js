@@ -207,6 +207,7 @@ function createSunburst() {
         .on("mouseout", handleMouseOut);
     g.selectAll(".centre-value-svg").remove();
     g.selectAll(".centre-subtitle-svg").remove();
+    g.selectAll(".centre-name-svg").remove();
     g.append("text")
         .attr("class", "centre-value-svg")
         .attr("text-anchor", "middle")
@@ -225,6 +226,20 @@ function createSunburst() {
         .attr("class", "centre-subtitle-svg")
         .attr("text-anchor", "middle")
         .attr("y", 32)
+        .attr("font-size", "0.9em")
+        .attr("fill", "#7f8c8d")
+        .attr("font-style", "italic")
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        })
+        .text("");
+    g.append("text")
+        .attr("class", "centre-name-svg")
+        .attr("text-anchor", "middle")
+        .attr("y", 52)
         .attr("font-size", "0.9em")
         .attr("fill", "#7f8c8d")
         .attr("font-style", "italic")
@@ -361,9 +376,11 @@ function updateCentreInfo(node) {
     const value = node.value;
     const percentage = formatNumber((value / root.value) * 100, 2);
     const subtitle = node.depth === 0 ? `100% of ${viewMode === "revenue" ? "revenue" : "budget"}` : `${percentage}% of ${viewMode === "revenue" ? "revenue" : "budget"}`;
+    const segmentName = node.depth === 0 ? "" : (node.data.name === "$m" && node.parent ? node.parent.data.name : node.data.name);
     // Update SVG text elements
     g.select(".centre-value-svg").text(formatCurrency(value));
     g.select(".centre-subtitle-svg").text(subtitle);
+    g.select(".centre-name-svg").text(segmentName);
 }
 
 function resetZoom() {
