@@ -5,6 +5,7 @@ const ARC_PAD_ANGLE_MAX = 0.005;
 const ARC_PAD_RADIUS_RATIO = 0.5;
 const HOLE_RADIUS_RATIO = 0.15;  // Size of donut hole (15% of total radius)
 const SEGMENT_THICKNESS = 60;    // Fixed thickness for each segment in pixels
+const CENTRE_CIRCLE_COLOR = "transparent";  // Original center circle color
 if (!window.squishedDepths) window.squishedDepths = new Set();
 
 let currentData = null;
@@ -159,9 +160,10 @@ function createSunburst() {
     g.append("circle")
         .attr("class", "centre-circle")
         .attr("r", radius * HOLE_RADIUS_RATIO * 2)
-        .style("fill", "transparent")
+        .style("fill", CENTRE_CIRCLE_COLOR)
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .style("pointer-events", "all")
+        .style("transition", "fill 0.3s ease")
         .on("click", function() {
             if (currentFocus !== root) {
                 resetZoom();
@@ -302,6 +304,18 @@ function clicked(event, p) {
     const squishedRingCount = root.descendants().filter(d => d.depth === ringDepth).length;
     const arcs = g.selectAll("path")
         .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)), d => d.ancestors().map(n => n.data.name).join("/"));
+    
+    // Change center circle color for leaf segments at start of transition
+    if (!p.children || p.children.length === 0) {
+        const clickedSegment = arcs.filter(d => d === p);
+        const segmentColor = clickedSegment.style("fill");
+        // Use a transition to animate the color change
+        g.select(".centre-circle")
+            .transition()
+            .duration(750) // Same duration as segment transition
+            .style("fill", segmentColor);
+    }
+    
     arcs.transition()
         .duration(750)
         .tween("data", d => {
@@ -363,6 +377,8 @@ function handleMouseOver(event, d) {
     d3.select(event.currentTarget)
         .style("opacity", 0.8)
         .style("stroke-width", "3px");
+    
+    
 }
 
 function handleMouseOut(event) {
@@ -370,6 +386,10 @@ function handleMouseOut(event) {
     d3.select(event.currentTarget)
         .style("opacity", 1)
         .style("stroke-width", "2px");
+    
+    // Reset center circle color
+    g.select(".centre-circle")
+        .style("fill", CENTRE_CIRCLE_COLOR);
 }
 
 function updateCentreInfo(node) {
@@ -385,6 +405,9 @@ function updateCentreInfo(node) {
 
 function resetZoom() {
     if (window.squishedDepths) window.squishedDepths.clear();
+    // Reset center circle color
+    g.select(".centre-circle")
+        .style("fill", CENTRE_CIRCLE_COLOR);
     // Make all segments visible again
     g.selectAll("path")
         .style("display", null)
