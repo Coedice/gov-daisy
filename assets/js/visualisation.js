@@ -1,8 +1,10 @@
 /* global d3 */
-const ARC_STROKE = "#fff";
-const ARC_STROKE_WIDTH = "2px";
+const ARC_STROKE = "#ECF0F1";
+const ARC_STROKE_WIDTH = "1px";
 const ARC_PAD_ANGLE_MAX = 0.005;
 const ARC_PAD_RADIUS_RATIO = 0.5;
+const HOLE_RADIUS_RATIO = 0.15;  // Size of donut hole (15% of total radius)
+const SEGMENT_THICKNESS = 60;    // Fixed thickness for each segment in pixels
 if (!window.squishedDepths) window.squishedDepths = new Set();
 
 let currentData = null;
@@ -122,7 +124,7 @@ function createSunburst() {
     const container = document.getElementById("visualisation-container");
     const width = Math.max(container.clientWidth - 40, 600);
     const height = 800;
-    radius = Math.min(width, height) / 2 - 20;
+    radius = Math.min(width, height) / 2;
     d3.select("#sunburst").selectAll("*").remove();
     svg = d3.select("#sunburst")
         .attr("width", width)
@@ -136,19 +138,27 @@ function createSunburst() {
         .sort((a, b) => b.value - a.value);
     partition(root);
     root.each(d => {
-        d.current = { x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1 };
+        d.current = {
+            x0: d.x0, 
+            x1: d.x1, 
+            depth: d.depth,
+            opacity: 1
+        };
+        d.originalX0 = d.x0;
+        d.originalX1 = d.x1;
+        d.originalDepth = d.depth;
     });
     arc = d3.arc()
-        .startAngle(d => d.x0)
-        .endAngle(d => d.x1)
+        .startAngle(d => Math.max(0, d.x0))
+        .endAngle(d => Math.min(2 * Math.PI, Math.max(d.x0, d.x1)))
         .padAngle(d => Math.min((d.x1 - d.x0) / 2, ARC_PAD_ANGLE_MAX))
         .padRadius(radius * ARC_PAD_RADIUS_RATIO)
-        .innerRadius(d => d.y0)
-        .outerRadius(d => d.y1 - 1);
+        .innerRadius(d => radius * HOLE_RADIUS_RATIO + d.depth * SEGMENT_THICKNESS)
+        .outerRadius(d => radius * HOLE_RADIUS_RATIO + (d.depth + 1) * SEGMENT_THICKNESS);
     g.selectAll(".centre-circle").remove();
     g.append("circle")
         .attr("class", "centre-circle")
-        .attr("r", radius * 0.35)
+        .attr("r", radius * HOLE_RADIUS_RATIO * 2)
         .style("fill", "transparent")
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .style("pointer-events", "all")
@@ -263,19 +273,18 @@ function clicked(event, p) {
     window.squishedDepths = new Set(
         Array.from(window.squishedDepths).filter(depth => depth < ringDepth)
     );
-    root.each(d => d.target = {
-        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-        y0: Math.max(0, d.y0 - p.depth),
-        y1: Math.max(0, d.y1 - p.depth)
+    root.each(d => {
+        const isClickedSegment = d === p;
+        const isAncestorOfClicked = !isClickedSegment && p !== root && p.ancestors().includes(d);
+        const newDepth = Math.max(0, d.originalDepth - p.originalDepth);
+        d.target = {
+            x0: Math.max(0, Math.min(1, (d.originalX0 - p.originalX0) / (p.originalX1 - p.originalX0))) * 2 * Math.PI,
+            x1: Math.max(0, Math.min(1, (d.originalX1 - p.originalX0) / (p.originalX1 - p.originalX0))) * 2 * Math.PI,
+            depth: newDepth,
+            opacity: (isClickedSegment || isAncestorOfClicked) ? 0 : 1  // Fade clicked segment and its ancestors
+        };
     });
     const squishedRingCount = root.descendants().filter(d => d.depth === ringDepth).length;
-    root.each(d => d.target = {
-        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-        y0: Math.max(0, d.y0 - p.depth),
-        y1: Math.max(0, d.y1 - p.depth)
-    });
     const arcs = g.selectAll("path")
         .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)), d => d.ancestors().map(n => n.data.name).join("/"));
     arcs.transition()
@@ -285,7 +294,13 @@ function clicked(event, p) {
             return t => d.current = i(t);
         })
         .attrTween("d", d => () => arc(d.current))
+        .styleTween("opacity", d => () => d.current.opacity || 1)
         .on("end", function() {
+            // Hide the clicked segment and its ancestors after fade out
+            const datum = d3.select(this).datum();
+            if (datum === p || (p !== root && p.ancestors().includes(datum))) {
+                d3.select(this).style("display", "none");
+            }
             window.squishedDepths.add(ringDepth);
             currentFocus = p;
             updateCentreInfo(currentFocus);
@@ -353,6 +368,14 @@ function updateCentreInfo(node) {
 
 function resetZoom() {
     if (window.squishedDepths) window.squishedDepths.clear();
+    // Make all segments visible again
+    g.selectAll("path")
+        .style("display", null)
+        .each(d => {
+            if (d.current && d.current.opacity === 0) {
+                d.current.opacity = 0; // Keep current opacity at 0 so it animates up
+            }
+        });
     clicked({ stopPropagation: () => {} }, root);
 }
 
