@@ -11,7 +11,7 @@ if (!window.squishedDepths) window.squishedDepths = new Set();
 let currentData = null;
 let currentYear = null;
 let viewMode = "budget";
-let svg, g, radius, arc, root;
+let svg, g, radius, arc, root, safeArc;
 let currentFocus = null;
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -156,6 +156,9 @@ function createSunburst() {
         .padRadius(radius * ARC_PAD_RADIUS_RATIO)
         .innerRadius(d => radius * HOLE_RADIUS_RATIO + d.depth * SEGMENT_THICKNESS)
         .outerRadius(d => radius * HOLE_RADIUS_RATIO + (d.depth + 1) * SEGMENT_THICKNESS);
+    
+    // Create a wrapper arc function that returns empty for zero-angle segments
+    safeArc = (d) => (d.x1 - d.x0) > 0 ? arc(d) : "";
     g.selectAll(".centre-circle").remove();
     g.append("circle")
         .attr("class", "centre-circle")
@@ -173,7 +176,7 @@ function createSunburst() {
         .domain(root.children.map(d => d.data.name))
         .range(d3.schemeSet3);
     g.selectAll("path")
-        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)))
+        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > 0))
         .join("path")
         .attr("fill", d => {
             let topLevel = d;
@@ -200,10 +203,11 @@ function createSunburst() {
             const deeperLightness = Math.max(0, Math.min(1, baseHSL.l - 0.12 - (d.depth - 2) * 0.07));
             return d3.hsl(childHue, childSat, deeperLightness).toString();
         })
-        .attr("d", arc)
+        .attr("d", safeArc)
         .style("cursor", "pointer")
         .style("stroke", ARC_STROKE)
         .style("stroke-width", ARC_STROKE_WIDTH)
+        .style("pointer-events", d => (d.x1 - d.x0) > 0 ? "auto" : "none")
         .on("click", clicked)
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut);
@@ -231,6 +235,9 @@ function createSunburst() {
         .attr("font-size", "0.9em")
         .attr("fill", "#7f8c8d")
         .attr("font-style", "italic")
+        .style("stroke", "#ECF0F1")
+        .style("stroke-width", "2px")
+        .style("paint-order", "stroke fill")
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .on("click", function() {
             if (currentFocus !== root) {
@@ -245,6 +252,9 @@ function createSunburst() {
         .attr("font-size", "0.9em")
         .attr("fill", "#7f8c8d")
         .attr("font-style", "italic")
+        .style("stroke", "#ECF0F1")
+        .style("stroke-width", "2px")
+        .style("paint-order", "stroke fill")
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .on("click", function() {
             if (currentFocus !== root) {
@@ -285,6 +295,12 @@ function findNodeByPath(node, pathArr, depth = 0) {
 
 function clicked(event, p) {
     event.stopPropagation();
+    
+    // Ignore clicks on zero-angle segments
+    if ((p.x1 - p.x0) <= 0.001) {
+        return;
+    }
+    
     const tapped = p;
     const ringDepth = tapped.depth;
     window.squishedDepths = new Set(
@@ -303,7 +319,7 @@ function clicked(event, p) {
     });
     const squishedRingCount = root.descendants().filter(d => d.depth === ringDepth).length;
     const arcs = g.selectAll("path")
-        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth)), d => d.ancestors().map(n => n.data.name).join("/"));
+        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > 0), d => d.ancestors().map(n => n.data.name).join("/"));
     
     // Change center circle color for leaf segments at start of transition
     if (!p.children || p.children.length === 0) {
@@ -322,7 +338,7 @@ function clicked(event, p) {
             const i = d3.interpolate(d.current, d.target);
             return t => d.current = i(t);
         })
-        .attrTween("d", d => () => arc(d.current))
+        .attrTween("d", d => () => safeArc(d.current))
         .styleTween("opacity", d => () => d.current.opacity || 1)
         .on("end", function() {
             // Hide the clicked segment and its ancestors after fade out
