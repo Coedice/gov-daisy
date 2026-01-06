@@ -1,11 +1,22 @@
-/* global d3 */
-const ARC_STROKE = "#ECF0F1";
-const ARC_STROKE_WIDTH = "1px";
+// Arc Appearance Constants
 const ARC_PAD_ANGLE_MAX = 0.005;
 const ARC_PAD_RADIUS_RATIO = 0.5;
+
+// Geometry Constants
 const HOLE_RADIUS_RATIO = 0.15;  // Size of donut hole (15% of total radius)
 const SEGMENT_THICKNESS = 60;    // Fixed thickness for each segment in pixels
 const CENTRE_CIRCLE_COLOR = "transparent";  // Original center circle color
+
+// Text Position Constants
+const CENTRE_VALUE_Y = 0;
+const CENTRE_SUBTITLE_Y = 32;
+const CENTRE_NAME_Y = 52;
+
+// Animation Constants
+const TRANSITION_DURATION = 750;  // Duration for segment transitions in ms
+
+// Filtering Constants
+const ZERO_ANGLE_THRESHOLD = 0;  // Minimum angle for segments to be visible
 if (!window.squishedDepths) window.squishedDepths = new Set();
 
 let currentData = null;
@@ -158,15 +169,13 @@ function createSunburst() {
         .outerRadius(d => radius * HOLE_RADIUS_RATIO + (d.depth + 1) * SEGMENT_THICKNESS);
     
     // Create a wrapper arc function that returns empty for zero-angle segments
-    safeArc = (d) => (d.x1 - d.x0) > 0 ? arc(d) : "";
+    safeArc = (d) => (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD ? arc(d) : "";
     g.selectAll(".centre-circle").remove();
     g.append("circle")
         .attr("class", "centre-circle")
         .attr("r", radius * HOLE_RADIUS_RATIO * 2)
-        .style("fill", CENTRE_CIRCLE_COLOR)
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .style("pointer-events", "all")
-        .style("transition", "fill 0.3s ease")
         .on("click", function() {
             if (currentFocus !== root) {
                 resetZoom();
@@ -176,7 +185,7 @@ function createSunburst() {
         .domain(root.children.map(d => d.data.name))
         .range(d3.schemeSet3);
     g.selectAll("path")
-        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > 0))
+        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD))
         .join("path")
         .attr("fill", d => {
             let topLevel = d;
@@ -204,10 +213,7 @@ function createSunburst() {
             return d3.hsl(childHue, childSat, deeperLightness).toString();
         })
         .attr("d", safeArc)
-        .style("cursor", "pointer")
-        .style("stroke", ARC_STROKE)
-        .style("stroke-width", ARC_STROKE_WIDTH)
-        .style("pointer-events", d => (d.x1 - d.x0) > 0 ? "auto" : "none")
+        .style("pointer-events", d => (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD ? "auto" : "none")
         .on("click", clicked)
         .on("mouseover", handleMouseOver)
         .on("mouseout", handleMouseOut);
@@ -216,11 +222,7 @@ function createSunburst() {
     g.selectAll(".centre-name-svg").remove();
     g.append("text")
         .attr("class", "centre-value-svg")
-        .attr("text-anchor", "middle")
-        .attr("y", 0)
-        .attr("font-size", "2em")
-        .attr("font-weight", 700)
-        .attr("fill", "#2c3e50")
+        .attr("y", CENTRE_VALUE_Y)
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .on("click", function() {
             if (currentFocus !== root) {
@@ -230,14 +232,7 @@ function createSunburst() {
         .text("");
     g.append("text")
         .attr("class", "centre-subtitle-svg")
-        .attr("text-anchor", "middle")
-        .attr("y", 32)
-        .attr("font-size", "0.9em")
-        .attr("fill", "#7f8c8d")
-        .attr("font-style", "italic")
-        .style("stroke", "#ECF0F1")
-        .style("stroke-width", "2px")
-        .style("paint-order", "stroke fill")
+        .attr("y", CENTRE_SUBTITLE_Y)
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .on("click", function() {
             if (currentFocus !== root) {
@@ -247,14 +242,47 @@ function createSunburst() {
         .text("");
     g.append("text")
         .attr("class", "centre-name-svg")
-        .attr("text-anchor", "middle")
-        .attr("y", 52)
-        .attr("font-size", "0.9em")
-        .attr("fill", "#7f8c8d")
-        .attr("font-style", "italic")
-        .style("stroke", "#ECF0F1")
-        .style("stroke-width", "2px")
-        .style("paint-order", "stroke fill")
+        .attr("y", CENTRE_NAME_Y)
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        })
+        .text("");
+    g.append("text")
+        .attr("class", "centre-subtitle-svg")
+        .attr("y", CENTRE_SUBTITLE_Y)
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        })
+        .text("");
+    g.append("text")
+        .attr("class", "centre-name-svg")
+        .attr("y", CENTRE_NAME_Y)
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        })
+        .text("");
+    g.append("text")
+        .attr("class", "centre-subtitle-svg")
+        .attr("y", CENTRE_SUBTITLE_Y)
+        .style("cursor", currentFocus !== root ? "pointer" : "default")
+        .on("click", function() {
+            if (currentFocus !== root) {
+                resetZoom();
+            }
+        })
+        .text("");
+    g.append("text")
+        .attr("class", "centre-name-svg")
+        .attr("y", CENTRE_NAME_Y)
         .style("cursor", currentFocus !== root ? "pointer" : "default")
         .on("click", function() {
             if (currentFocus !== root) {
@@ -319,7 +347,7 @@ function clicked(event, p) {
     });
     const squishedRingCount = root.descendants().filter(d => d.depth === ringDepth).length;
     const arcs = g.selectAll("path")
-        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > 0), d => d.ancestors().map(n => n.data.name).join("/"));
+        .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD), d => d.ancestors().map(n => n.data.name).join("/"));
     
     // Change center circle color for leaf segments at start of transition
     if (!p.children || p.children.length === 0) {
@@ -328,12 +356,12 @@ function clicked(event, p) {
         // Use a transition to animate the color change
         g.select(".centre-circle")
             .transition()
-            .duration(750) // Same duration as segment transition
+            .duration(TRANSITION_DURATION) // Same duration as segment transition
             .style("fill", segmentColor);
     }
     
     arcs.transition()
-        .duration(750)
+        .duration(TRANSITION_DURATION)
         .tween("data", d => {
             const i = d3.interpolate(d.current, d.target);
             return t => d.current = i(t);
@@ -391,8 +419,7 @@ function handleMouseOver(event, d) {
     
     // Highlight the segment
     d3.select(event.currentTarget)
-        .style("opacity", 0.8)
-        .style("stroke-width", "3px");
+        .classed("hovered", true);
     
     
 }
@@ -400,8 +427,7 @@ function handleMouseOver(event, d) {
 function handleMouseOut(event) {
     document.getElementById("tooltip").style.display = "none";
     d3.select(event.currentTarget)
-        .style("opacity", 1)
-        .style("stroke-width", "2px");
+        .classed("hovered", false);
     
     // Reset center circle color
     g.select(".centre-circle")

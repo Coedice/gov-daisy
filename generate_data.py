@@ -145,8 +145,15 @@ def export_yearly_yaml(
         if "budget" in node and year in node["budget"]:
             parent_val = node["budget"][year]
             # Check if children all have budget values for this year
-            if children and all("budget" in c and isinstance(c["budget"], (int, float)) for c in children):
-                children_sum = sum(c["budget"] for c in children if "budget" in c and isinstance(c["budget"], (int, float)))
+            if children and all(
+                "budget" in c and isinstance(c["budget"], (int, float))
+                for c in children
+            ):
+                children_sum = sum(
+                    c["budget"]
+                    for c in children
+                    if "budget" in c and isinstance(c["budget"], (int, float))
+                )
                 # If parent's value is not exactly the sum of its children, keep it
                 if abs(parent_val - children_sum) > 1e-6:
                     new_node["budget"] = parent_val

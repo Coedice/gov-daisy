@@ -8,6 +8,9 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
+  "globals": {
+    "d3": "readonly"
+  },
   "rules": {
     "semi": ["error", "always"],
     "quotes": ["error", "double"]

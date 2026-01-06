@@ -1,5 +1,6 @@
 ---
 ---
+// SCSS Variables
 $primary-color: #2c3e50;
 $secondary-color: #3498db;
 $success-color: #27ae60;
@@ -13,6 +14,21 @@ $border-color: #bdc3c7;
 $shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
 $font-stack: 'Helvetica Neue', Arial, sans-serif;
+
+// Arc Appearance Constants
+$arc-stroke-width: 1px;
+$arc-stroke: #ECF0F1;
+
+// Center Circle Constants
+$centre-circle-color: transparent;
+
+// Text Appearance Constants
+$centre-value-font-size: 2em;
+$centre-text-font-size: 0.9em;
+$centre-value-color: #2c3e50;
+$centre-text-color: #7f8c8d;
+$centre-text-stroke: #ECF0F1;
+$centre-text-stroke-width: 2px;
 
 @mixin transition($props...) {
 	transition: $props;
@@ -110,7 +126,7 @@ body {
 }
 
 header {
-	background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+	background: $primary-color;
 	color: #fff;
 	padding: 2rem 0;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -162,6 +178,9 @@ main {
 				border-color: $secondary-color;
 			}
 		}
+		#year-slider {
+			min-width: 300px;
+		}
 	}
 	.btn {
 		padding: 0.6rem 1.5rem;
@@ -208,5 +227,40 @@ footer {
 	}
 	p {
 		opacity: 0.9;
+	}
+}
+
+// Sunburst SVG Styles
+.centre-circle {
+	fill: $centre-circle-color;
+	transition: fill 0.3s ease;
+}
+
+.centre-value-svg {
+	text-anchor: middle;
+	font-size: $centre-value-font-size;
+	font-weight: 700;
+	fill: $centre-value-color;
+}
+
+.centre-subtitle-svg, .centre-name-svg {
+	text-anchor: middle;
+	font-size: $centre-text-font-size;
+	fill: $centre-text-color;
+	font-style: italic;
+	stroke: $centre-text-stroke;
+	stroke-width: $centre-text-stroke-width;
+	paint-order: stroke fill;
+}
+
+// Sunburst Path Styles
+path {
+	stroke: $arc-stroke;
+	stroke-width: $arc-stroke-width;
+	cursor: pointer;
+	
+	&.hovered {
+		opacity: 0.8;
+		stroke-width: 3px;
 	}
 }
