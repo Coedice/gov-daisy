@@ -24,6 +24,39 @@ let currentYear = null;
 let viewMode = "budget";
 let svg, g_scale, g_translate, radius, arc, root, safeArc;
 let currentFocus = null;
+let colour;
+
+function getNodeColor(node, colourScale) {
+    if (!node || !colourScale) return "#ccc";
+    
+    let topLevel = node;
+    while (topLevel.depth > 1) topLevel = topLevel.parent;
+    const parentColour = colourScale(topLevel.data.name);
+    
+    if (node.depth === 1) {
+        return parentColour;
+    }
+    
+    let secondLevelAncestor = node;
+    while (secondLevelAncestor.depth > 2) secondLevelAncestor = secondLevelAncestor.parent;
+    const siblings = secondLevelAncestor.parent && secondLevelAncestor.parent.children ? secondLevelAncestor.parent.children : [];
+    const idx = Math.max(0, siblings.indexOf(secondLevelAncestor));
+    const count = Math.max(1, siblings.length);
+    const baseHSL = d3.hsl(parentColour);
+    const hueSpan = 60;
+    const frac = count > 1 ? idx / (count - 1) : 0.5;
+    const hueOffset = (frac - 0.5) * hueSpan;
+    const childHue = (baseHSL.h + hueOffset + 360) % 360;
+    const satSpan = 0.2;
+    const childSat = Math.max(0, Math.min(1, baseHSL.s + (frac - 0.5) * satSpan));
+    
+    if (node.depth === 2) {
+        return d3.hsl(childHue, childSat, baseHSL.l).toString();
+    }
+    
+    const deeperLightness = Math.max(0, Math.min(1, baseHSL.l - 0.12 - (node.depth - 2) * 0.07));
+    return d3.hsl(childHue, childSat, deeperLightness).toString();
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     if (window.expenditureData && window.yearSliderYears) {
@@ -219,37 +252,13 @@ function createSunburst() {
                 resetZoom();
             }
         });
-    const colour = d3.scaleOrdinal()
+    colour = d3.scaleOrdinal()
         .domain(root.children.map(d => d.data.name))
         .range(d3.schemeSet3);
     g_scale.selectAll("path")
         .data(root.descendants().filter(d => d.depth > 0 && !window.squishedDepths.has(d.depth) && (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD))
         .join("path")
-        .attr("fill", d => {
-            let topLevel = d;
-            while (topLevel.depth > 1) topLevel = topLevel.parent;
-            const parentColour = colour(topLevel.data.name);
-            if (d.depth === 1) {
-                return parentColour;
-            }
-            let secondLevelAncestor = d;
-            while (secondLevelAncestor.depth > 2) secondLevelAncestor = secondLevelAncestor.parent;
-            const siblings = secondLevelAncestor.parent && secondLevelAncestor.parent.children ? secondLevelAncestor.parent.children : [];
-            const idx = Math.max(0, siblings.indexOf(secondLevelAncestor));
-            const count = Math.max(1, siblings.length);
-            const baseHSL = d3.hsl(parentColour);
-            const hueSpan = 60;
-            const frac = count > 1 ? idx / (count - 1) : 0.5;
-            const hueOffset = (frac - 0.5) * hueSpan;
-            const childHue = (baseHSL.h + hueOffset + 360) % 360;
-            const satSpan = 0.2;
-            const childSat = Math.max(0, Math.min(1, baseHSL.s + (frac - 0.5) * satSpan));
-            if (d.depth === 2) {
-                return d3.hsl(childHue, childSat, baseHSL.l).toString();
-            }
-            const deeperLightness = Math.max(0, Math.min(1, baseHSL.l - 0.12 - (d.depth - 2) * 0.07));
-            return d3.hsl(childHue, childSat, deeperLightness).toString();
-        })
+        .attr("fill", d => getNodeColor(d, colour))
         .attr("d", safeArc)
         .style("pointer-events", d => (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD ? "auto" : "none")
         .on("click", clicked)
@@ -334,6 +343,9 @@ function createSunburst() {
     } else {
         updateCentreInfo(currentFocus);
     }
+    
+    // Update legend
+    updateLegend();
 }
 
 
@@ -415,13 +427,13 @@ function clicked(event, p) {
             window.squishedDepths.add(ringDepth);
             currentFocus = p;
             updateCentreInfo(currentFocus);
+            updateLegend(currentFocus);
         });
     if (squishedRingCount === 0) {
         const ancestryPath = getAncestryPath(p);
         const newFocus = findNodeByPath(root, ancestryPath);
         currentFocus = newFocus || root;
         createSunburst();
-        updateCentreInfo(currentFocus);
     }
 }
 
@@ -459,7 +471,14 @@ function handleMouseOver(event, d) {
     d3.select(event.currentTarget)
         .classed("hovered", true);
     
-    
+    // Highlight corresponding legend item
+    const legendItems = document.querySelectorAll(".legend-item");
+    legendItems.forEach(item => {
+        const nameElement = item.querySelector(".legend-name");
+        if (nameElement && nameElement.textContent === label) {
+            item.style.backgroundColor = "rgba(52, 152, 219, 0.1)";
+        }
+    });
 }
 
 function handleMouseOut(event) {
@@ -470,6 +489,12 @@ function handleMouseOut(event) {
     // Reset center circle color
     g_scale.select(".centre-circle")
         .style("fill", CENTRE_CIRCLE_COLOR);
+    
+    // Remove legend highlight
+    const legendItems = document.querySelectorAll(".legend-item");
+    legendItems.forEach(item => {
+        item.style.backgroundColor = "";
+    });
 }
 
 function updateCentreInfo(node) {
@@ -537,13 +562,84 @@ function formatCurrency(value) {
     return sign + "$" + formatNumber(abs, 2) + suffixes[i];
 }
 
+function updateLegend(focusNode = currentFocus) {
+    const legendDiv = document.getElementById("legend");
+    if (!legendDiv || !root || !focusNode) return;
+    
+    // Determine the current layer depth
+    const currentDepth = focusNode.depth + 1;
+    
+    // Get all visible nodes at the current depth
+    let currentLayerNodes = root.descendants().filter(d => 
+        d.depth === currentDepth && 
+        !window.squishedDepths.has(d.depth) && 
+        (d.x1 - d.x0) > ZERO_ANGLE_THRESHOLD &&
+        d.parent && 
+        focusNode.descendants().includes(d.parent)
+    );
+    
+    // Sort by value (descending)
+    currentLayerNodes.sort((a, b) => b.value - a.value);
+    
+    // Only update if there are items to show
+    if (currentLayerNodes.length === 0) return;
+    
+    // Clear existing legend content
+    legendDiv.innerHTML = "";
+    
+    // Add legend items
+    currentLayerNodes.forEach(node => {
+        const item = document.createElement("div");
+        item.className = "legend-item";
+        
+        // Get the color for this node using the common function
+        const nodeColor = getNodeColor(node, colour);
+        
+        // Create color box
+        const colorBox = document.createElement("div");
+        colorBox.className = "legend-color";
+        colorBox.style.backgroundColor = nodeColor;
+        
+        // Create text content
+        const textContent = document.createElement("div");
+        textContent.className = "legend-text";
+        
+        const name = document.createElement("div");
+        name.className = "legend-name";
+        name.textContent = node.data.name === "$m" && node.parent ? node.parent.data.name : node.data.name;
+        
+        const value = document.createElement("div");
+        value.className = "legend-value";
+        value.textContent = formatCurrency(node.value);
+        
+        textContent.appendChild(name);
+        textContent.appendChild(value);
+        
+        item.appendChild(colorBox);
+        item.appendChild(textContent);
+        
+        // Add click handler to zoom to this segment
+        item.addEventListener("click", () => {
+            const event = { stopPropagation: () => {} };
+            clicked(event, node);
+        });
+        
+        legendDiv.appendChild(item);
+    });
+}
+
 // Handle window resize
 let resizeTimer;
+let lastWidth = window.innerWidth;
 window.addEventListener("resize", function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
-        if (currentData) {
-            createSunburst();
+        // Only recreate if width actually changed significantly (to avoid mobile scroll triggers)
+        if (Math.abs(window.innerWidth - lastWidth) > 50) {
+            if (currentData) {
+                createSunburst();
+            }
+            lastWidth = window.innerWidth;
         }
     }, 250);
 });

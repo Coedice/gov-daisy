@@ -17,8 +17,11 @@ title: Gov Daisy
         </div>
     </div>
     <div id="visualisation-container">
-        <svg id="sunburst"></svg>
+        <div class="visualization-wrapper">
+            <svg id="sunburst"></svg>
+        </div>
         <div id="tooltip" class="tooltip"></div>
+        <div id="legend" class="legend"></div>
     </div>
 </main>
 {% assign budget_years = '' | split: ',' %}
