@@ -27,12 +27,11 @@ let currentFocus = null;
 
 document.addEventListener("DOMContentLoaded", function() {
     if (window.expenditureData && window.yearSliderYears) {
-        const yearSlider = document.getElementById("year-slider");
+        const yearDropdown = document.getElementById("year-dropdown");
         const years = window.yearSliderYears;
-        // Set up slider min, max, and value
-        if (yearSlider) {
-            yearSlider.min = 0;
-            yearSlider.max = years.length - 1;
+        // Set up dropdown options
+        if (yearDropdown) {
+            yearDropdown.innerHTML = "";
             // Try to set default to current fiscal year if present
             let fyIdx = -1;
             for (let i = 0; i < years.length; i++) {
@@ -53,15 +52,33 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
             }
-            let idx = fyIdx !== -1 ? fyIdx : years.length - 1;
-            yearSlider.value = idx;
-            currentYear = years[idx] || years[years.length - 1];
-            // Set the label
-            const yearSliderValue = document.getElementById("year-slider-value");
-            if (yearSliderValue) {
-                let displayYear = currentYear.replace("_","-");
-                yearSliderValue.textContent = displayYear;
+            // Now populate dropdown with all options
+            for (let i = 0; i < years.length; i++) {
+                const option = document.createElement("option");
+                option.value = years[i];
+                let displayYear = years[i].replace("_", "-");
+                const now = new Date();
+                const fyParts = displayYear.split("-");
+                let fyEnd = null;
+                if (fyParts.length === 2) {
+                    let startYear = parseInt(fyParts[0], 10);
+                    let endYearShort = parseInt(fyParts[1], 10);
+                    if (!isNaN(startYear) && !isNaN(endYearShort)) {
+                        let century = Math.floor(startYear / 100) * 100;
+                        let endYear = century + endYearShort;
+                        if (endYearShort < (startYear % 100)) endYear += 100;
+                        fyEnd = endYear;
+                    }
+                }
+                if (fyEnd !== null && fyEnd > now.getFullYear()) {
+                    displayYear += " (estimate)";
+                }
+                option.textContent = displayYear;
+                yearDropdown.appendChild(option);
             }
+            let idx = fyIdx !== -1 ? fyIdx : years.length - 1;
+            yearDropdown.value = years[idx];
+            currentYear = years[idx] || years[years.length - 1];
         }
     }
     initialiseVisualisation();
@@ -79,16 +96,38 @@ function setupDataTypeSwitch() {
             window.expenditureData = window.revenueData;
             viewMode = "revenue";
         }
-        // Update year slider and reload data
+        // Update year dropdown and reload data
         const years = Object.keys(window.expenditureData).sort();
         window.yearSliderYears = years;
-        const yearSlider = document.getElementById("year-slider");
-        if (yearSlider) {
-            yearSlider.min = 0;
-            yearSlider.max = years.length - 1;
+        const yearDropdown = document.getElementById("year-dropdown");
+        if (yearDropdown) {
+            yearDropdown.innerHTML = "";
+            years.forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                let displayYear = year.replace("_", "-");
+                const now = new Date();
+                const fyParts = displayYear.split("-");
+                let fyEnd = null;
+                if (fyParts.length === 2) {
+                    let startYear = parseInt(fyParts[0], 10);
+                    let endYearShort = parseInt(fyParts[1], 10);
+                    if (!isNaN(startYear) && !isNaN(endYearShort)) {
+                        let century = Math.floor(startYear / 100) * 100;
+                        let endYear = century + endYearShort;
+                        if (endYearShort < (startYear % 100)) endYear += 100;
+                        fyEnd = endYear;
+                    }
+                }
+                if (fyEnd !== null && fyEnd > now.getFullYear()) {
+                    displayYear += " (estimate)";
+                }
+                option.textContent = displayYear;
+                yearDropdown.appendChild(option);
+            });
             let idx = years.indexOf(currentYear);
             if (idx === -1) idx = years.length - 1;
-            yearSlider.value = idx;
+            yearDropdown.value = years[idx];
             currentYear = years[idx];
         }
         currentFocus = null;
@@ -97,16 +136,12 @@ function setupDataTypeSwitch() {
 }
 
 function setupEventListeners() { 
-    const yearSlider = document.getElementById("year-slider");
-    const yearSliderValue = document.getElementById("year-slider-value");
-    if (yearSlider && yearSliderValue && window.yearSliderYears) {
-        yearSlider.addEventListener("input", function(event) {
-            const idx = parseInt(event.target.value, 10);
-            const years = window.yearSliderYears;
-            if (years && years[idx]) {
-                let displayYear = years[idx].replace("_","-");
-                yearSliderValue.textContent = displayYear;
-                handleYearChange({ target: { value: years[idx] } });
+    const yearDropdown = document.getElementById("year-dropdown");
+    if (yearDropdown && window.yearSliderYears) {
+        yearDropdown.addEventListener("change", function(event) {
+            const selectedYear = event.target.value;
+            if (selectedYear) {
+                handleYearChange({ target: { value: selectedYear } });
                 if (typeof root !== "undefined") {
                     updateCentreInfo(root);
                 }
@@ -471,33 +506,12 @@ async function handleYearChange(event) {
     if (window.squishedDepths) window.squishedDepths.clear();
     currentFocus = null;
     createSunburst();
-    // Update slider position if changed programmatically
-    const yearSlider = document.getElementById("year-slider");
+    // Update dropdown position if changed programmatically
+    const yearDropdown = document.getElementById("year-dropdown");
     const years = window.yearSliderYears;
-    if (yearSlider && years) {
+    if (yearDropdown && years) {
         const idx = years.indexOf(currentYear);
-        if (idx !== -1) yearSlider.value = idx;
-        const yearSliderValue = document.getElementById("year-slider-value");
-        if (yearSliderValue) {
-            let displayYear = currentYear.replace("_","-");
-            const now = new Date();
-            const fyParts = displayYear.split("-");
-            let fyEnd = null;
-            if (fyParts.length === 2) {
-                let startYear = parseInt(fyParts[0], 10);
-                let endYearShort = parseInt(fyParts[1], 10);
-                if (!isNaN(startYear) && !isNaN(endYearShort)) {
-                    let century = Math.floor(startYear / 100) * 100;
-                    let endYear = century + endYearShort;
-                    if (endYearShort < (startYear % 100)) endYear += 100;
-                    fyEnd = endYear;
-                }
-            }
-            if (fyEnd !== null && fyEnd > now.getFullYear()) {
-                displayYear += " (estimate)";
-            }
-            yearSliderValue.textContent = displayYear;
-        }
+        if (idx !== -1) yearDropdown.value = years[idx];
     }
     // Ensure centre-value updates to the new root for the selected year
     if (typeof root !== "undefined") {

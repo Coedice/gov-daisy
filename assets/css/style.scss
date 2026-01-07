@@ -182,9 +182,6 @@ main {
 				border-color: $secondary-color;
 			}
 		}
-		#year-slider {
-			min-width: 300px;
-		}
 	}
 	.btn {
 		padding: 0.6rem 1.5rem;
@@ -211,7 +208,6 @@ main {
 footer {
 	background: $primary-color;
 	color: #fff;
-	padding: 2rem 0;
 	text-align: center;
 	a {
 		color: #fff;
@@ -310,8 +306,7 @@ path {
 			gap: 0.5rem;
 			
 			select,
-			input[type="text"],
-			#year-slider {
+			input[type="text"] {
 				min-width: auto;
 				width: 100%;
 			}
