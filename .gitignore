@@ -2,18 +2,4 @@ _site/
 .sass-cache/
 .jekyll-cache/
 .jekyll-metadata
-vendor/
 Gemfile.lock
-.DS_Store
-
-# Python/uv/venv
-.venv/
-__pycache__/
-*.pyc
-uv.lock
-
-# Node/npm/ESLint
-node_modules/
-package-lock.json
-npm-debug.log*
-.eslintcache
